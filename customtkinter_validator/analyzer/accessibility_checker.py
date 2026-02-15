@@ -259,7 +259,13 @@ class AccessibilityChecker:
         primary_keywords = {
             "submit", "save", "confirm", "login", "sign in",
             "register", "ok", "send", "apply", "continue",
-            "reset", "delete", "remove", "cancel",
+            "reset", "delete", "remove",
+        }
+        # Context-dependent buttons are commonly disabled at startup until
+        # a specific operation begins.  These are standard UX, not issues.
+        context_dependent = {
+            "cancel", "stop", "abort", "pause", "resume",
+            "undo", "redo", "retry",
         }
 
         for node in flat:
@@ -269,6 +275,8 @@ class AccessibilityChecker:
             if node.get("enabled", True):
                 continue
             text = (node.get("text") or "").lower().strip()
+            if text in context_dependent:
+                continue
             if any(keyword in text for keyword in primary_keywords):
                 issues.append(
                     AccessibilityIssue(

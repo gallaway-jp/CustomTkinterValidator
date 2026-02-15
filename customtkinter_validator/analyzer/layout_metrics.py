@@ -285,6 +285,8 @@ class LayoutMetrics:
         violations: list[LayoutViolation] = []
         groups: dict[str | None, list[dict[str, Any]]] = {}
         for node in flat:
+            if not node.get("visibility", True):
+                continue
             parent = node.get("parent_id")
             groups.setdefault(parent, []).append(node)
 
@@ -374,7 +376,9 @@ class LayoutMetrics:
         """Detect alignment inconsistencies among sibling widgets.
 
         Groups siblings by parent and checks whether their left edges are
-        consistently aligned.
+        consistently aligned. For grid-managed containers, alignment is
+        checked within each grid column separately so that multi-column
+        layouts are not penalised.
 
         Args:
             flat: Flat list of widget nodes.
@@ -385,6 +389,8 @@ class LayoutMetrics:
         violations: list[LayoutViolation] = []
         groups: dict[str | None, list[dict[str, Any]]] = {}
         for node in flat:
+            if not node.get("visibility", True):
+                continue
             parent = node.get("parent_id")
             groups.setdefault(parent, []).append(node)
 
@@ -392,41 +398,80 @@ class LayoutMetrics:
         for siblings in groups.values():
             if len(siblings) < 3:
                 continue
-            left_edges = [s.get("abs_x", 0) for s in siblings if s.get("width", 0) > 0]
-            if len(left_edges) < 3:
-                continue
-            most_common_x = max(set(left_edges), key=left_edges.count)
-            for s in siblings:
-                sx = s.get("abs_x", 0)
-                if s.get("width", 0) == 0:
-                    continue
-                diff = abs(sx - most_common_x)
-                if 0 < diff > tolerance:
-                    violations.append(
-                        LayoutViolation(
-                            rule_id="alignment_inconsistency",
-                            severity="low",
-                            widget_id=s.get("test_id", "unknown"),
-                            related_widget_id=None,
-                            description=(
-                                f"'{s.get('test_id')}' left edge at x={sx} deviates "
-                                f"{diff}px from the common alignment at x={most_common_x}"
-                            ),
-                            recommended_fix=(
-                                f"Align '{s.get('test_id')}' with its siblings at "
-                                f"x={most_common_x}"
-                            ),
-                            measured_value=float(diff),
-                            threshold=float(tolerance),
-                        )
-                    )
+
+            # Determine if siblings are grid-managed
+            grid_managed = any(
+                node.get("layout_manager") == "grid" for node in siblings
+            )
+
+            if grid_managed:
+                # Group by grid column and check alignment within each column.
+                # Grid manages alignment via cell structure; small pixel
+                # differences arise from sticky settings and internal padding,
+                # so we use a more lenient tolerance.
+                grid_tolerance = max(tolerance * 3, 10)
+                col_groups: dict[int, list[dict[str, Any]]] = {}
+                for s in siblings:
+                    detail: dict[str, Any] = s.get("layout_detail") or {}
+                    col_val: Any = detail.get("col", detail.get("column", 0))
+                    try:
+                        col_idx = int(col_val)
+                    except (ValueError, TypeError):
+                        col_idx = 0
+                    col_groups.setdefault(col_idx, []).append(s)
+                for col_siblings in col_groups.values():
+                    self._check_alignment_group(col_siblings, grid_tolerance, violations)
+            else:
+                self._check_alignment_group(siblings, tolerance, violations)
+
         return violations
+
+    def _check_alignment_group(
+        self,
+        siblings: list[dict[str, Any]],
+        tolerance: int,
+        violations: list[LayoutViolation],
+    ) -> None:
+        """Check left-edge alignment for a group of sibling widgets."""
+        if len(siblings) < 3:
+            return
+        left_edges = [s.get("abs_x", 0) for s in siblings if s.get("width", 0) > 0]
+        if len(left_edges) < 3:
+            return
+        most_common_x = max(set(left_edges), key=left_edges.count)
+        for s in siblings:
+            sx = s.get("abs_x", 0)
+            if s.get("width", 0) == 0:
+                continue
+            diff = abs(sx - most_common_x)
+            if 0 < diff > tolerance:
+                violations.append(
+                    LayoutViolation(
+                        rule_id="alignment_inconsistency",
+                        severity="low",
+                        widget_id=s.get("test_id", "unknown"),
+                        related_widget_id=None,
+                        description=(
+                            f"'{s.get('test_id')}' left edge at x={sx} deviates "
+                            f"{diff}px from the common alignment at x={most_common_x}"
+                        ),
+                        recommended_fix=(
+                            f"Align '{s.get('test_id')}' with its siblings at "
+                            f"x={most_common_x}"
+                        ),
+                        measured_value=float(diff),
+                        threshold=float(tolerance),
+                    )
+                )
 
     def _check_symmetry(self, flat: list[dict[str, Any]]) -> list[LayoutViolation]:
         """Basic symmetry detection within containers.
 
         Checks whether widgets within a container are approximately symmetrical
         about the container's horizontal centre.
+
+        Grid-managed containers are skipped because multi-column grids are
+        intentionally asymmetric (e.g. label – entry pairs).
 
         Args:
             flat: Flat list of widget nodes.
@@ -442,6 +487,8 @@ class LayoutMetrics:
 
         groups: dict[str | None, list[dict[str, Any]]] = {}
         for node in flat:
+            if not node.get("visibility", True):
+                continue
             parent = node.get("parent_id")
             groups.setdefault(parent, []).append(node)
 
@@ -455,6 +502,10 @@ class LayoutMetrics:
                 continue
             parent_width = parent_node.get("width", 0)
             if parent_width <= 0 or len(children) < 2:
+                continue
+
+            # Skip grid-managed containers — they are intentionally asymmetric
+            if any(c.get("layout_manager") == "grid" for c in children):
                 continue
 
             parent_abs_x = parent_node.get("abs_x", 0)
@@ -497,6 +548,9 @@ class LayoutMetrics:
     ) -> list[LayoutViolation]:
         """Detect child widgets extending beyond their parent's bounding box.
 
+        Invisible widgets (e.g. inactive ``CTkTabview`` tab content) are
+        excluded.
+
         Args:
             flat: Flat list of widget nodes.
 
@@ -509,6 +563,8 @@ class LayoutMetrics:
         node_map = {n.get("test_id"): n for n in flat}
 
         for node in flat:
+            if not node.get("visibility", True):
+                continue
             parent_id = node.get("parent_id")
             if parent_id is None:
                 continue
@@ -564,7 +620,7 @@ class LayoutMetrics:
         """Flag text widgets whose text length suggests possible truncation.
 
         Uses a rough estimate: if text characters × 8px exceeds the widget
-        width, the text may be clipped.
+        width, the text may be clipped. Invisible widgets are skipped.
 
         Args:
             flat: Flat list of widget nodes.
@@ -578,6 +634,8 @@ class LayoutMetrics:
         for node in flat:
             wtype = node.get("widget_type", "")
             if wtype not in label_types:
+                continue
+            if not node.get("visibility", True):
                 continue
             text = node.get("text") or ""
             if not text or len(text) < 5:

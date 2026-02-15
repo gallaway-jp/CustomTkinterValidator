@@ -1,6 +1,6 @@
 """CustomTkinter Validator - AI-native GUI testing and UX validation framework."""
 
-__version__ = "1.0.0"
+__version__ = "2.0.1"
 __author__ = "CustomTkinter Validator Team"
 
 from customtkinter_validator.core.config import ValidatorConfig

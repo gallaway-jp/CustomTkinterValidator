@@ -222,6 +222,9 @@ class RuleEngine:
     def _rule_hidden_interactive(tree: dict[str, Any]) -> list[RuleViolation]:
         """Flag interactive widgets that are not visible.
 
+        Widgets hidden because they reside in an inactive ``CTkTabview`` tab
+        are excluded — tabbed UIs intentionally hide non-active content.
+
         Args:
             tree: Widget tree.
 
@@ -235,9 +238,16 @@ class RuleEngine:
             "Button", "Entry", "Checkbutton",
         }
         violations: list[RuleViolation] = []
-        for node in RuleEngine._flatten(tree):
+
+        def _walk(node: dict[str, Any], inside_tabview: bool) -> None:
             wtype = node.get("widget_type", "")
-            if wtype in interactive and not node.get("visibility", True):
+            # Track whether we've entered a CTkTabview subtree
+            in_tab = inside_tabview or wtype == "CTkTabview"
+            if (
+                wtype in interactive
+                and not node.get("visibility", True)
+                and not in_tab
+            ):
                 violations.append(
                     RuleViolation(
                         rule_id="hidden_interactive",
@@ -253,6 +263,10 @@ class RuleEngine:
                         ),
                     )
                 )
+            for child in node.get("children", []):
+                _walk(child, in_tab)
+
+        _walk(tree, False)
         return violations
 
     @staticmethod
@@ -327,6 +341,9 @@ class RuleEngine:
     def _rule_zero_dimension(tree: dict[str, Any]) -> list[RuleViolation]:
         """Flag visible widgets with zero width or height.
 
+        Widgets inside ``CTkTabview`` (inactive tabs) are excluded because
+        they may legitimately have zero size until their tab is selected.
+
         Args:
             tree: Widget tree.
 
@@ -334,30 +351,37 @@ class RuleEngine:
             Violations.
         """
         violations: list[RuleViolation] = []
-        for node in RuleEngine._flatten(tree):
+
+        def _walk(node: dict[str, Any], inside_tabview: bool) -> None:
+            wtype = node.get("widget_type", "")
+            in_tab = inside_tabview or wtype == "CTkTabview"
             if not node.get("visibility", True):
-                continue
+                for child in node.get("children", []):
+                    _walk(child, in_tab)
+                return
             w = node.get("width", 0)
             h = node.get("height", 0)
-            if w == 0 or h == 0:
-                wtype = node.get("widget_type", "")
-                if wtype in ("CTk", "Tk", "Toplevel"):
-                    continue
-                violations.append(
-                    RuleViolation(
-                        rule_id="zero_dimension_widget",
-                        severity="medium",
-                        widget_id=node.get("test_id", "unknown"),
-                        description=(
-                            f"Widget '{node.get('test_id')}' has dimensions "
-                            f"{w}x{h}px — it may not be rendered"
-                        ),
-                        recommended_fix=(
-                            f"Ensure '{node.get('test_id')}' has a size set "
-                            f"either explicitly or via its layout manager"
-                        ),
+            if (w == 0 or h == 0) and not in_tab:
+                if wtype not in ("CTk", "Tk", "Toplevel"):
+                    violations.append(
+                        RuleViolation(
+                            rule_id="zero_dimension_widget",
+                            severity="medium",
+                            widget_id=node.get("test_id", "unknown"),
+                            description=(
+                                f"Widget '{node.get('test_id')}' has dimensions "
+                                f"{w}x{h}px — it may not be rendered"
+                            ),
+                            recommended_fix=(
+                                f"Ensure '{node.get('test_id')}' has a size set "
+                                f"either explicitly or via its layout manager"
+                            ),
+                        )
                     )
-                )
+            for child in node.get("children", []):
+                _walk(child, in_tab)
+
+        _walk(tree, False)
         return violations
 
     @staticmethod
@@ -397,6 +421,10 @@ class RuleEngine:
                 continue
             if node.get("enabled", True):
                 continue
+            # Hidden widgets (e.g. inactive CTkTabview tabs) don't need
+            # an explanation label — the user can't see them yet.
+            if not node.get("visibility", True):
+                continue
             # Check if any sibling label mentions disabled/unavailable/required/etc.
             parent = node.get("parent_id")
             sibling_labels = labels_by_parent.get(parent, [])
@@ -409,6 +437,17 @@ class RuleEngine:
                 for label in sibling_labels
             )
             if not has_explanation:
+                # Skip buttons whose text implies context-dependent state
+                # (e.g. Cancel, Stop, Abort) — these are commonly disabled
+                # at startup and enabled once an operation begins.
+                btn_text = (node.get("text") or "").lower().strip()
+                context_dependent_labels = {
+                    "cancel", "stop", "abort", "pause", "resume",
+                    "undo", "redo", "retry", "reset", "revert",
+                }
+                if btn_text in context_dependent_labels:
+                    continue
+
                 violations.append(
                     RuleViolation(
                         rule_id="disabled_without_reason",

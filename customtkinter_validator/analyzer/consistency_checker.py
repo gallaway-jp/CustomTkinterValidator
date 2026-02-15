@@ -136,7 +136,7 @@ class ConsistencyChecker:
         groups: dict[str | None, list[dict[str, Any]]] = defaultdict(list)
         for node in flat:
             if node.get("widget_type", "") in target_types:
-                if node.get("width", 0) > 0:
+                if node.get("width", 0) > 1 and node.get("visibility", True):
                     groups[node.get("parent_id")].append(node)
 
         for siblings in groups.values():
@@ -181,10 +181,14 @@ class ConsistencyChecker:
     def _check_inconsistent_fonts(
         self, flat: list[dict[str, Any]]
     ) -> list[ConsistencyIssue]:
-        """Flag sibling widgets of the same type using different fonts."""
+        """Flag sibling widgets of the same type using different fonts.
+
+        Labels (``CTkLabel``, ``TLabel``, ``Label``) are excluded because
+        they legitimately use different font sizes and styles for different
+        semantic roles (headings, body text, captions, info-icons).
+        """
         issues: list[ConsistencyIssue] = []
         comparable_types = _BUTTON_TYPES | _ENTRY_TYPES | {
-            "CTkLabel", "TLabel", "Label",
             "CTkCheckBox", "TCheckBox", "Checkbutton",
         }
 
@@ -376,7 +380,11 @@ class ConsistencyChecker:
 
         groups: dict[str | None, list[dict[str, Any]]] = defaultdict(list)
         for node in flat:
-            if node.get("width", 0) > 0 and node.get("height", 0) > 0:
+            if (
+                node.get("width", 0) > 0
+                and node.get("height", 0) > 0
+                and node.get("visibility", True)
+            ):
                 groups[node.get("parent_id")].append(node)
 
         for parent_id, siblings in groups.items():

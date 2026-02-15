@@ -179,6 +179,14 @@ class ContrastChecker:
         Interactive elements and their borders must have at least 3:1 contrast
         against their adjacent background.
 
+        **CTk-aware**: CustomTkinter interactive widgets (``CTkButton``,
+        ``CTkEntry``, etc.) render their visual appearance via an internal
+        Tk canvas, *not* through their outer frame's ``fg_color`` /
+        ``bg_color``. When the outer frame background equals the parent
+        background it simply means the widget adopts transparent styling
+        and the canvas provides the real visual contrast. These widgets are
+        skipped to avoid false positives.
+
         Args:
             flat: Flat list of widget nodes.
 
@@ -191,6 +199,13 @@ class ContrastChecker:
             "CTkRadioButton", "CTkSlider", "CTkOptionMenu", "CTkComboBox",
             "TButton", "TEntry", "TCheckBox", "TSwitch",
             "TRadioButton", "TSlider", "TOptionMenu", "TComboBox",
+        }
+        # CTk widget types whose visual rendering is done via internal canvas.
+        # The outer frame bg_color is NOT the visual colour the user sees.
+        _CTK_CANVAS_RENDERED: set[str] = {
+            "CTkButton", "CTkEntry", "CTkCheckBox", "CTkSwitch",
+            "CTkRadioButton", "CTkSlider", "CTkOptionMenu", "CTkComboBox",
+            "CTkTextbox", "CTkSegmentedButton",
         }
         required = self._config.min_contrast_non_text
         node_map = {n.get("test_id"): n for n in flat}
@@ -219,6 +234,14 @@ class ContrastChecker:
                 continue
 
             ratio = self.contrast_ratio(widget_rgb, parent_rgb)
+
+            # CTk widgets render through canvas — the outer frame bg is
+            # just structural, not the visual colour the user sees.  When
+            # the computed outer-frame-vs-parent ratio is very low it
+            # simply means the transparent frame blends into its parent
+            # while the internal canvas provides the real contrast.
+            if wtype in _CTK_CANVAS_RENDERED and ratio < 1.5:
+                continue
             if ratio < required:
                 issues.append(
                     ContrastIssue(

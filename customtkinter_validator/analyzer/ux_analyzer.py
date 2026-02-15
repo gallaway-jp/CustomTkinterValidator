@@ -7,7 +7,6 @@ serialised widget-tree metadata — no live widgets or screenshots required.
 
 from __future__ import annotations
 
-from collections import Counter
 from dataclasses import dataclass
 from typing import Any
 
@@ -390,8 +389,14 @@ class UXAnalyzer:
                 and len(children) == 1
             ):
                 child = children[0]
-                # Only flag if the single child is also a container
-                if child.get("widget_type", "") in _CONTAINER_TYPES:
+                child_type = child.get("widget_type", "")
+                # Only flag if the single child is also a container, but
+                # NOT if the child is a CTkScrollableFrame (which needs
+                # a wrapper frame by design).
+                if (
+                    child_type in _CONTAINER_TYPES
+                    and child_type != "CTkScrollableFrame"
+                ):
                     issues.append(
                         UXIssue(
                             rule_id="single_child_container",
@@ -533,7 +538,13 @@ class UXAnalyzer:
         primary_keywords = {
             "submit", "save", "confirm", "ok", "send", "apply",
             "continue", "login", "sign in", "register", "search",
-            "create", "add", "update",
+            "create", "add", "update", "start", "run", "go",
+            "begin", "launch", "execute", "process", "review",
+            "generate", "build", "deploy", "publish", "import",
+            "export", "download", "upload", "connect", "install",
+            "open", "close", "delete", "remove", "edit", "modify",
+            "analyze", "analyse", "validate", "verify", "check",
+            "scan", "test", "sync", "refresh", "load", "fetch",
         }
         has_primary_btn = False
         for node in flat:
@@ -652,6 +663,10 @@ class UXAnalyzer:
     def _classify_casing(text: str) -> str:
         """Classify a text string's casing style.
 
+        Handles acronyms (2–4 letter all-caps words like "AI", "PDF", "URL")
+        by normalising them to title-case before classification so that
+        text like ``"AI Fix"`` is not mis-classified as ``"Mixed"``.
+
         Returns one of: ``'Title Case'``, ``'UPPERCASE'``, ``'lowercase'``,
         ``'Sentence case'``, ``'Mixed'``.
         """
@@ -659,11 +674,21 @@ class UXAnalyzer:
             return "UPPERCASE"
         if text.islower():
             return "lowercase"
-        if text == text.title():
-            return "Title Case"
+        # Normalise acronyms (2–4 char all-caps words) before classifying
         words = text.split()
+        normalised: list[str] = []
+        for w in words:
+            if w.isupper() and 2 <= len(w) <= 4:
+                # Treat as acronym — title-case it for classification
+                normalised.append(w.capitalize())
+            else:
+                normalised.append(w)
+        normalised_text = " ".join(normalised)
+        if normalised_text == normalised_text.title():
+            return "Title Case"
         if len(words) >= 1 and words[0][0].isupper() and all(
-            w[0].islower() for w in words[1:] if w
+            w[0].islower() or (w.isupper() and 2 <= len(w) <= 4)
+            for w in words[1:] if w
         ):
             return "Sentence case"
         return "Mixed"

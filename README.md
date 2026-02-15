@@ -239,6 +239,23 @@ The framework guarantees deterministic, replayable test runs through:
 
 ---
 
+## CTk-Aware False Positive Handling (v2.0.1)
+
+CustomTkinter's architecture introduces patterns that naive analysis would incorrectly flag. The validator recognises and suppresses these CTk-inherent issues:
+
+| Pattern | Handling |
+|---|---|
+| **CTkTabview inactive tabs** | Widgets hidden by tab switching are excluded from hidden-interactive, zero-dimension, disabled-without-reason, alignment, symmetry, spacing, overlap, touch-target, truncation, and button-size checks |
+| **CTk canvas rendering** | Interactive CTk widgets (CTkButton, CTkEntry, etc.) render via an internal Tk canvas — the outer frame bg naturally blends with its parent. Non-text contrast checks skip these when the ratio is below 1.5:1 |
+| **Grid alignment tolerance** | Grid-managed containers use 3× the normal alignment tolerance (min 10px) since small x-offsets come from `sticky` settings and internal padding, not misalignment |
+| **Label font diversity** | Labels are excluded from font consistency checks because they serve diverse semantic roles (headings, body, captions, info-icons) |
+| **Context-dependent disabled buttons** | Buttons with text like "Cancel", "Stop", "Abort", "Pause", "Undo", "Redo" are expected to start disabled and are excluded from disabled-without-reason and disabled-primary-action checks |
+| **Acronyms in button casing** | Short all-caps words (2–4 chars, e.g. "AI", "PDF") are treated as single tokens for casing classification, so "AI Fix" is correctly classified as Title Case |
+| **CTkScrollableFrame wrappers** | Single-child containers whose child is a CTkScrollableFrame are not flagged as unnecessary nesting |
+| **Expanded primary action keywords** | 40+ action verbs recognised (start, run, review, execute, launch, analyse, validate, etc.) to avoid false no-primary-action warnings |
+
+---
+
 ## Performance Considerations
 
 | Operation | Typical Time | Notes |
@@ -264,7 +281,7 @@ For large applications (500+ widgets), the overlap detection's O(n²) pairwise c
 {
   "metadata": {
     "tool": "CustomTkinter Validator",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "timestamp": "2026-02-15T12:00:00+00:00",
     "python_version": "3.12.0",
     "platform": "Windows-11-...",
