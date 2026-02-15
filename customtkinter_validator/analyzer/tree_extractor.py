@@ -74,6 +74,13 @@ class TreeExtractor:
         visibility = self._get_visibility(widget)
         enabled = self._get_enabled_state(widget)
         layout_info = self._get_layout_info(widget)
+        placeholder = self._get_placeholder(widget)
+        corner_radius = self._get_numeric_attr(widget, "corner_radius")
+        border_width = self._get_numeric_attr(widget, "border_width")
+        has_command = self._has_command(widget)
+        has_image = self._has_image(widget)
+        values = self._get_values(widget)
+        detailed_layout = self._get_detailed_layout_info(widget, layout_info.get("manager"))
 
         children_data: list[dict[str, Any]] = []
         children_ids: list[str] = []
@@ -90,6 +97,7 @@ class TreeExtractor:
             "widget_type": widget_type,
             "test_id": test_id,
             "text": text,
+            "placeholder_text": placeholder,
             "font_family": font_info.get("family"),
             "font_size": font_info.get("size"),
             "font_weight": font_info.get("weight"),
@@ -108,6 +116,12 @@ class TreeExtractor:
             "children": children_data,
             "layout_manager": layout_info.get("manager"),
             "padding": layout_info.get("padding"),
+            "corner_radius": corner_radius,
+            "border_width": border_width,
+            "has_command": has_command,
+            "has_image": has_image,
+            "values": values,
+            "layout_detail": detailed_layout,
         }
 
     def _get_text(self, widget: tk.Misc) -> str | None:
@@ -446,6 +460,162 @@ class TreeExtractor:
             # Include all user children, whether or not they're in the registry
             result.append(child)
         return result
+
+    @staticmethod
+    def _get_placeholder(widget: tk.Misc) -> str | None:
+        """Extract placeholder text from an entry widget.
+
+        Args:
+            widget: The widget to inspect.
+
+        Returns:
+            Placeholder text, or ``None``.
+        """
+        for attr in ("_placeholder_text", "placeholder_text"):
+            val = getattr(widget, attr, None)
+            if val and isinstance(val, str):
+                return val
+        try:
+            return str(widget.cget("placeholder_text"))  # type: ignore[arg-type]
+        except (tk.TclError, AttributeError, ValueError):
+            pass
+        return None
+
+    @staticmethod
+    def _get_numeric_attr(widget: tk.Misc, attr: str) -> int | None:
+        """Read a numeric configuration attribute.
+
+        Args:
+            widget: The widget to inspect.
+            attr: The attribute name (e.g. ``'corner_radius'``).
+
+        Returns:
+            Integer value, or ``None``.
+        """
+        try:
+            val = widget.cget(attr)  # type: ignore[arg-type]
+            if val is not None:
+                return int(val)
+        except (tk.TclError, AttributeError, ValueError, TypeError):
+            pass
+        raw = getattr(widget, f"_{attr}", None)
+        if raw is not None:
+            try:
+                return int(raw)
+            except (ValueError, TypeError):
+                pass
+        return None
+
+    @staticmethod
+    def _has_command(widget: tk.Misc) -> bool:
+        """Check whether a widget has a command/callback bound.
+
+        Args:
+            widget: The widget to inspect.
+
+        Returns:
+            ``True`` if a command is bound.
+        """
+        cmd = getattr(widget, "_command", None)
+        if cmd is not None:
+            return True
+        try:
+            cmd_str = widget.cget("command")  # type: ignore[arg-type]
+            if cmd_str and str(cmd_str).strip():
+                return True
+        except (tk.TclError, AttributeError, ValueError):
+            pass
+        return False
+
+    @staticmethod
+    def _has_image(widget: tk.Misc) -> bool:
+        """Check whether a widget has an image configured.
+
+        Args:
+            widget: The widget to inspect.
+
+        Returns:
+            ``True`` if an image is present.
+        """
+        img = getattr(widget, "_image", None)
+        if img is not None:
+            return True
+        try:
+            img_val = widget.cget("image")  # type: ignore[arg-type]
+            if img_val and str(img_val).strip():
+                return True
+        except (tk.TclError, AttributeError, ValueError):
+            pass
+        return False
+
+    @staticmethod
+    def _get_values(widget: tk.Misc) -> list[str] | None:
+        """Extract selectable values from combo/option-menu widgets.
+
+        Args:
+            widget: The widget to inspect.
+
+        Returns:
+            List of value strings, or ``None``.
+        """
+        raw = getattr(widget, "_values", None)
+        if raw is not None and isinstance(raw, (list, tuple)):
+            return [str(v) for v in raw]
+        try:
+            val = widget.cget("values")  # type: ignore[arg-type]
+            if val and isinstance(val, (list, tuple)):
+                return [str(v) for v in val]
+        except (tk.TclError, AttributeError, ValueError):
+            pass
+        return None
+
+    @staticmethod
+    def _get_detailed_layout_info(widget: tk.Misc, manager: str | None) -> dict[str, Any] | None:
+        """Extract detailed grid/pack placement parameters.
+
+        Args:
+            widget: The widget to inspect.
+            manager: Layout manager name (``'grid'``, ``'pack'``, or ``'place'``).
+
+        Returns:
+            Dictionary of layout details, or ``None``.
+        """
+        if manager == "grid":
+            try:
+                info = widget.grid_info()
+                return {
+                    "row": int(info.get("row", 0)),
+                    "column": int(info.get("column", 0)),
+                    "rowspan": int(info.get("rowspan", 1)),
+                    "columnspan": int(info.get("columnspan", 1)),
+                    "sticky": str(info.get("sticky", "")),
+                }
+            except (tk.TclError, ValueError):
+                pass
+        elif manager == "pack":
+            try:
+                info = widget.pack_info()
+                return {
+                    "side": str(info.get("side", "top")),
+                    "fill": str(info.get("fill", "none")),
+                    "expand": bool(int(info.get("expand", 0))),
+                    "anchor": str(info.get("anchor", "center")),
+                }
+            except (tk.TclError, ValueError):
+                pass
+        elif manager == "place":
+            try:
+                info = widget.place_info()
+                return {
+                    "relx": float(info.get("relx", 0)),
+                    "rely": float(info.get("rely", 0)),
+                    "relwidth": float(info.get("relwidth", 0)),
+                    "relheight": float(info.get("relheight", 0)),
+                    "anchor": str(info.get("anchor", "nw")),
+                }
+            except (tk.TclError, ValueError):
+                pass
+        return None
 
     def _is_container(self, widget: tk.Misc) -> bool:
         """Check whether a widget is a container that holds user children.

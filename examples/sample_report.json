@@ -1,8 +1,8 @@
 {
   "metadata": {
     "tool": "CustomTkinter Validator",
-    "version": "1.0.0",
-    "timestamp": "2026-02-15T06:03:55.940144+00:00",
+    "version": "2.0.0",
+    "timestamp": "2026-02-15T06:52:53.622664+00:00",
     "python_version": "3.13.9",
     "platform": "Windows-10-10.0.19045-SP0",
     "tab_order": [
@@ -20,6 +20,7 @@
     "widget_type": "CTk",
     "test_id": "CTk_root",
     "text": null,
+    "placeholder_text": null,
     "font_family": null,
     "font_size": null,
     "font_weight": "normal",
@@ -47,6 +48,7 @@
         "widget_type": "TLabel",
         "test_id": "heading_label",
         "text": "User Registration",
+        "placeholder_text": null,
         "font_family": "Roboto",
         "font_size": 22,
         "font_weight": "bold",
@@ -69,12 +71,24 @@
           "pady": 30,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 0,
+        "border_width": null,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "none",
+          "expand": false,
+          "anchor": "center"
         }
       },
       {
         "widget_type": "TFrame",
         "test_id": "form_frame",
         "text": null,
+        "placeholder_text": null,
         "font_family": null,
         "font_size": null,
         "font_weight": "normal",
@@ -103,6 +117,7 @@
             "widget_type": "TLabel",
             "test_id": "name_label",
             "text": "Full Name:",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -125,12 +140,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 0,
+            "border_width": null,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 0,
+              "column": 0,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "e"
             }
           },
           {
             "widget_type": "TEntry",
             "test_id": "name_entry",
             "text": "",
+            "placeholder_text": "Enter name...",
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -153,12 +181,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 2,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 0,
+              "column": 1,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "ew"
             }
           },
           {
             "widget_type": "TLabel",
             "test_id": "email_label",
             "text": "Email:",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -181,12 +222,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 0,
+            "border_width": null,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 1,
+              "column": 0,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "e"
             }
           },
           {
             "widget_type": "TEntry",
             "test_id": "email_entry",
             "text": "",
+            "placeholder_text": "Enter email...",
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -209,12 +263,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 2,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 1,
+              "column": 1,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "ew"
             }
           },
           {
             "widget_type": "TLabel",
             "test_id": "password_label",
             "text": "Password:",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -237,12 +304,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 0,
+            "border_width": null,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 2,
+              "column": 0,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "e"
             }
           },
           {
             "widget_type": "TEntry",
             "test_id": "password_entry",
             "text": "",
+            "placeholder_text": "Enter password...",
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -265,12 +345,25 @@
               "pady": 12,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 2,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 2,
+              "column": 1,
+              "rowspan": 1,
+              "columnspan": 1,
+              "sticky": "ew"
             }
           },
           {
             "widget_type": "TCheckBox",
             "test_id": "agree_checkbox",
             "text": "I agree to the Terms and Conditions",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -285,14 +378,70 @@
             "visibility": true,
             "enabled": true,
             "parent_id": "form_frame",
-            "children_ids": [],
-            "children": [],
+            "children_ids": [
+              "CTk_root.TFrame_0.TCheckBox_0.CTkCanvas_0"
+            ],
+            "children": [
+              {
+                "widget_type": "CTkCanvas",
+                "test_id": "CTk_root.TFrame_0.TCheckBox_0.CTkCanvas_0",
+                "text": null,
+                "placeholder_text": null,
+                "font_family": null,
+                "font_size": null,
+                "font_weight": "normal",
+                "fg_color": null,
+                "bg_color": "#2b2b2b",
+                "width": 364,
+                "height": 36,
+                "x": 0,
+                "y": 0,
+                "abs_x": 299,
+                "abs_y": 588,
+                "visibility": true,
+                "enabled": true,
+                "parent_id": "agree_checkbox",
+                "children_ids": [],
+                "children": [],
+                "layout_manager": "grid",
+                "padding": {
+                  "padx": 0,
+                  "pady": 0,
+                  "ipadx": 0,
+                  "ipady": 0
+                },
+                "corner_radius": null,
+                "border_width": null,
+                "has_command": false,
+                "has_image": false,
+                "values": null,
+                "layout_detail": {
+                  "row": 0,
+                  "column": 0,
+                  "rowspan": 1,
+                  "columnspan": 3,
+                  "sticky": "nesw"
+                }
+              }
+            ],
             "layout_manager": "grid",
             "padding": {
               "padx": 15,
               "pady": 15,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 3,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "row": 3,
+              "column": 0,
+              "rowspan": 1,
+              "columnspan": 2,
+              "sticky": "w"
             }
           }
         ],
@@ -302,12 +451,24 @@
           "pady": 15,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 6,
+        "border_width": 0,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "x",
+          "expand": false,
+          "anchor": "center"
         }
       },
       {
         "widget_type": "TFrame",
         "test_id": "button_frame",
         "text": null,
+        "placeholder_text": null,
         "font_family": null,
         "font_size": null,
         "font_weight": "normal",
@@ -331,6 +492,7 @@
             "widget_type": "TButton",
             "test_id": "submit_btn",
             "text": "Submit",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -353,12 +515,24 @@
               "pady": 8,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 0,
+            "has_command": true,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "side": "left",
+              "fill": "none",
+              "expand": false,
+              "anchor": "center"
             }
           },
           {
             "widget_type": "TButton",
             "test_id": "reset_btn",
             "text": "Reset",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -381,6 +555,17 @@
               "pady": 8,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 0,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "side": "left",
+              "fill": "none",
+              "expand": false,
+              "anchor": "center"
             }
           }
         ],
@@ -390,12 +575,24 @@
           "pady": 8,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 6,
+        "border_width": 0,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "x",
+          "expand": false,
+          "anchor": "center"
         }
       },
       {
         "widget_type": "TLabel",
         "test_id": "error_label",
         "text": "",
+        "placeholder_text": null,
         "font_family": "Roboto",
         "font_size": 12,
         "font_weight": "normal",
@@ -418,12 +615,24 @@
           "pady": 8,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 0,
+        "border_width": null,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "none",
+          "expand": false,
+          "anchor": "center"
         }
       },
       {
         "widget_type": "TFrame",
         "test_id": "footer_frame",
         "text": null,
+        "placeholder_text": null,
         "font_family": null,
         "font_size": null,
         "font_weight": "normal",
@@ -447,6 +656,7 @@
             "widget_type": "TLabel",
             "test_id": "status_label",
             "text": "Status: Ready",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 11,
             "font_weight": "normal",
@@ -469,12 +679,24 @@
               "pady": 8,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 0,
+            "border_width": null,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "side": "top",
+              "fill": "x",
+              "expand": false,
+              "anchor": "center"
             }
           },
           {
             "widget_type": "TButton",
             "test_id": "close_btn",
             "text": "Close",
+            "placeholder_text": null,
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -497,6 +719,17 @@
               "pady": 15,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 0,
+            "has_command": true,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "side": "top",
+              "fill": "none",
+              "expand": false,
+              "anchor": "center"
             }
           }
         ],
@@ -506,12 +739,24 @@
           "pady": 15,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 6,
+        "border_width": 0,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "x",
+          "expand": false,
+          "anchor": "center"
         }
       },
       {
         "widget_type": "TFrame",
         "test_id": "notes_frame",
         "text": null,
+        "placeholder_text": null,
         "font_family": null,
         "font_size": null,
         "font_weight": "normal",
@@ -534,6 +779,7 @@
             "widget_type": "TEntry",
             "test_id": "notes_entry",
             "text": "",
+            "placeholder_text": "Additional notes...",
             "font_family": "Roboto",
             "font_size": 13,
             "font_weight": "normal",
@@ -556,6 +802,17 @@
               "pady": 8,
               "ipadx": 0,
               "ipady": 0
+            },
+            "corner_radius": 6,
+            "border_width": 2,
+            "has_command": false,
+            "has_image": false,
+            "values": null,
+            "layout_detail": {
+              "side": "top",
+              "fill": "x",
+              "expand": false,
+              "anchor": "center"
             }
           }
         ],
@@ -565,6 +822,17 @@
           "pady": 8,
           "ipadx": 0,
           "ipady": 0
+        },
+        "corner_radius": 6,
+        "border_width": 0,
+        "has_command": false,
+        "has_image": false,
+        "values": null,
+        "layout_detail": {
+          "side": "top",
+          "fill": "x",
+          "expand": false,
+          "anchor": "center"
         }
       }
     ],
@@ -574,7 +842,13 @@
       "pady": 0,
       "ipadx": 0,
       "ipady": 0
-    }
+    },
+    "corner_radius": null,
+    "border_width": null,
+    "has_command": false,
+    "has_image": false,
+    "values": null,
+    "layout_detail": null
   },
   "layout_violations": [
     {
@@ -694,6 +968,102 @@
       "wcag_level": "AA",
       "description": "'status_label' has contrast ratio 1.90:1 (required: 4.5:1 for normal text)",
       "recommended_fix": "Change the foreground colour of 'status_label' to achieve at least 4.5:1 contrast against #2b2b2b"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "name_entry",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'name_entry' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'name_entry' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "email_entry",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'email_entry' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'email_entry' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "password_entry",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'password_entry' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'password_entry' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "agree_checkbox",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'agree_checkbox' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'agree_checkbox' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "submit_btn",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'submit_btn' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'submit_btn' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "reset_btn",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'reset_btn' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'reset_btn' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "close_btn",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'close_btn' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'close_btn' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
+    },
+    {
+      "rule_id": "insufficient_non_text_contrast",
+      "severity": "medium",
+      "widget_id": "notes_entry",
+      "fg_color": "#2b2b2b",
+      "bg_color": "#242424",
+      "contrast_ratio": 1.1,
+      "required_ratio": 3.0,
+      "wcag_level": "AA",
+      "description": "Interactive element 'notes_entry' has non-text contrast ratio 1.10:1 against its parent background (required: 3.0:1 per WCAG 2.1 §1.4.11)",
+      "recommended_fix": "Increase the visual contrast between 'notes_entry' and its parent background to at least 3.0:1 by adjusting colours or adding a visible border"
     }
   ],
   "accessibility_issues": [
@@ -717,6 +1087,41 @@
       "widget_id": "close_btn",
       "description": "Interactive widget 'close_btn' has takefocus disabled and cannot be reached via keyboard navigation",
       "recommended_fix": "Set takefocus=True on 'close_btn' or provide an alternative keyboard-accessible way to interact with it"
+    }
+  ],
+  "ux_issues": [
+    {
+      "rule_id": "missing_window_title",
+      "severity": "medium",
+      "widget_id": "CTk_root",
+      "description": "Application window 'CTk_root' has no meaningful title. Window titles help users identify the application.",
+      "recommended_fix": "Set a descriptive window title using app.title('My Application')."
+    },
+    {
+      "rule_id": "button_no_command",
+      "severity": "high",
+      "widget_id": "reset_btn",
+      "description": "Button 'reset_btn' has no command callback bound. Clicking it does nothing.",
+      "recommended_fix": "Bind a command callback to 'reset_btn' using the 'command' parameter."
+    }
+  ],
+  "consistency_issues": [
+    {
+      "rule_id": "inconsistent_font",
+      "severity": "low",
+      "widget_id": "heading_label",
+      "description": "Sibling TLabel widgets use 2 different font styles: heading_label, error_label. This creates visual inconsistency.",
+      "recommended_fix": "Use a consistent font for all TLabel widgets within the same container.",
+      "related_widget_id": "error_label"
+    }
+  ],
+  "rule_violations": [
+    {
+      "rule_id": "disabled_without_reason",
+      "severity": "low",
+      "widget_id": "reset_btn",
+      "description": "Widget 'reset_btn' is disabled but there is no nearby text explaining why",
+      "recommended_fix": "Add a label or tooltip near 'reset_btn' explaining why it is disabled and what the user needs to do to enable it"
     }
   ],
   "interaction_results": [
@@ -788,9 +1193,10 @@
     }
   ],
   "summary_score": {
-    "layout_score": 45.0,
-    "accessibility_score": 35.0,
+    "layout_score": 40.0,
+    "accessibility_score": 0.0,
+    "ux_score": 70.0,
     "interaction_score": 100.0,
-    "overall_score": 57.5
+    "overall_score": 37.5
   }
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "customtkinter-validator"
-version = "1.0.0"
+version = "2.0.0"
 description = "AI-native GUI testing and UX validation framework for CustomTkinter applications"
 readme = "README.md"
 requires-python = ">=3.12"

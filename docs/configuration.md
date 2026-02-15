@@ -52,10 +52,15 @@ runner = TestRunner(config=config)
 strict_config = ValidatorConfig(
     min_contrast_ratio_normal=7.0,   # AAA
     min_contrast_ratio_large=4.5,    # AAA
+    min_contrast_ratio_aaa_normal=7.0,
+    min_contrast_ratio_aaa_large=4.5,
+    min_contrast_non_text=3.0,
     min_touch_target_px=44,          # Larger targets
     min_padding_px=8,
+    min_font_size_pt=11,             # Larger minimum font
     alignment_tolerance_px=1,
-    symmetry_tolerance_px=1
+    symmetry_tolerance_px=1,
+    max_widgets_per_container=8      # Stricter cognitive limit
 )
 ```
 
@@ -67,8 +72,12 @@ lenient_config = ValidatorConfig(
     min_contrast_ratio_large=2.5,
     min_touch_target_px=16,
     min_padding_px=2,
+    min_font_size_pt=7,
     alignment_tolerance_px=5,
-    symmetry_tolerance_px=8
+    symmetry_tolerance_px=8,
+    max_widgets_per_container=20,
+    max_button_text_length=50,
+    inconsistent_size_tolerance_pct=80.0
 )
 ```
 
@@ -78,8 +87,10 @@ lenient_config = ValidatorConfig(
 mobile_config = ValidatorConfig(
     min_touch_target_px=48,          # iOS/Android guidelines
     min_padding_px=8,
+    min_font_size_pt=12,             # Larger text for mobile
     alignment_tolerance_px=3,
-    symmetry_tolerance_px=5
+    symmetry_tolerance_px=5,
+    max_widgets_per_container=6      # Fewer widgets per screen
 )
 ```
 

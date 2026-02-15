@@ -161,10 +161,19 @@ runner = TestRunner(config=config)
 |-------|------|---------|-------------|
 | `min_contrast_ratio_normal` | `float` | `4.5` | WCAG AA contrast for normal text |
 | `min_contrast_ratio_large` | `float` | `3.0` | WCAG AA contrast for large text (18pt+) |
+| `min_contrast_ratio_aaa_normal` | `float` | `7.0` | WCAG AAA contrast for normal text |
+| `min_contrast_ratio_aaa_large` | `float` | `4.5` | WCAG AAA contrast for large text |
+| `min_contrast_non_text` | `float` | `3.0` | WCAG 2.1 non-text contrast (§1.4.11) |
 | `min_touch_target_px` | `int` | `24` | Minimum touch target size (WCAG 2.5.5) |
-| `min_padding_px` | `int` | `4` | Minimum padding around widgets |
-| `alignment_tolerance_px` | `int` | `2` | Tolerance for alignment checks |
-| `symmetry_tolerance_px` | `int` | `3` | Tolerance for symmetry checks |
+| `min_padding_px` | `int` | `4` | Minimum padding between widgets |
+| `alignment_tolerance_px` | `int` | `3` | Tolerance for alignment checks |
+| `symmetry_tolerance_px` | `int` | `10` | Tolerance for symmetry checks |
+| `min_font_size_pt` | `int` | `9` | Minimum readable font size |
+| `max_widgets_per_container` | `int` | `12` | Maximum widgets before cognitive overload |
+| `max_button_text_length` | `int` | `30` | Maximum button label character count |
+| `inconsistent_size_tolerance_pct` | `float` | `50.0` | Tolerance for sibling size consistency |
+| `widget_outside_bounds_tolerance_px` | `int` | `2` | Pixels allowed outside parent bounds |
+| `tab_visual_order_tolerance_px` | `int` | `20` | Tolerance for tab vs visual order |
 | `max_tree_depth` | `int` | `50` | Maximum widget tree depth |
 | `container_widget_types` | `set[str]` | See below | Widget types treated as containers |
 | `internal_attr_names` | `list[str]` | See below | CTk internal widget attributes |
@@ -303,6 +312,20 @@ tree = extractor.extract(root_widget)
     "children_ids": list[str],
     "children": list[dict],
     "layout_manager": str,  # "pack" | "grid" | "place" | "wm"
+    "padding": dict,
+    "placeholder_text": str | None,
+    "corner_radius": int | None,
+    "border_width": int | None,
+    "has_command": bool,
+    "has_image": bool,
+    "values": list[str] | None,
+    "layout_detail": dict  # Detailed grid/pack/place info
+}
+    "enabled": bool,
+    "parent_id": str | None,
+    "children_ids": list[str],
+    "children": list[dict],
+    "layout_manager": str,  # "pack" | "grid" | "place" | "wm"
     "padding": dict
 }
 ```
@@ -324,6 +347,8 @@ violations = metrics.analyse(widget_tree)
 - Touch targets too small
 - Alignment inconsistencies
 - Symmetry deviations
+- Widget outside parent bounds
+- Content truncation risk
 
 ### Contrast Checker
 
@@ -336,11 +361,10 @@ checker = ContrastChecker(config)
 issues = checker.check(widget_tree)
 ```
 
-**Formula:** Uses official WCAG relative luminance calculation
-```
-L = 0.2126 * R + 0.7152 * G + 0.0722 * B  (where R,G,B are linearized)
-contrast_ratio = (L1 + 0.05) / (L2 + 0.05)
-```
+**Detects:**
+- WCAG AA violations (4.5:1 normal, 3:1 large)
+- WCAG AAA violations (7:1 normal, 4.5:1 large)
+- Non-text contrast violations (3:1 per §1.4.11)
 
 ### Accessibility Checker
 
@@ -359,6 +383,54 @@ tab_order = checker.compute_tab_order()
 - Disabled primary action buttons
 - Unreachable widgets (no keyboard access)
 - Empty focus chains
+- Small text (below `min_font_size_pt`)
+- Tab order vs visual order mismatch
+
+### UX Analyzer
+
+Heuristic analysis of common UX anti-patterns.
+
+```python
+from customtkinter_validator.analyzer.ux_analyzer import UXAnalyzer
+
+analyzer = UXAnalyzer(config)
+ux_issues = analyzer.analyse(widget_tree)
+```
+
+**Detects:**
+- Cognitive overload (too many widgets per container)
+- Duplicate button labels
+- Long button text
+- Inconsistent button casing
+- Missing placeholder text in entries
+- Orphaned labels
+- Single-child containers (unnecessary nesting)
+- Missing window title
+- Empty selection widgets
+- Ungrouped radio buttons
+- No primary action in container
+- Buttons without command callbacks
+- Deep single nesting chains
+
+### Consistency Checker
+
+Validate visual consistency across similar widgets.
+
+```python
+from customtkinter_validator.analyzer.consistency_checker import ConsistencyChecker
+
+checker = ConsistencyChecker(config)
+consistency_issues = checker.check(widget_tree)
+```
+
+**Detects:**
+- Inconsistent button sizes among siblings
+- Inconsistent entry widths
+- Inconsistent fonts in same widget type
+- Inconsistent padding
+- Inconsistent corner radii
+- Mixed layout managers among siblings
+- Inconsistent spacing between siblings
 
 ---
 
@@ -369,7 +441,7 @@ tab_order = checker.compute_tab_order()
 ```json
 {
   "tool": "CustomTkinter Validator",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "timestamp": "2026-02-15T12:00:00+00:00",
   "python_version": "3.12.0",
   "platform": "Windows-10-...",
@@ -426,19 +498,26 @@ Additional fields vary by violation type:
 ### Score Calculation
 
 ```python
-# Layout Score
+# Layout Score (includes consistency issues)
 base = 100
-deduction = sum(SEVERITY_DEDUCTIONS[v.severity] for v in violations)
+deduction = sum(SEVERITY_DEDUCTIONS[v.severity] for v in layout_violations + consistency_issues)
 layout_score = max(0, base - deduction)
 
-# Accessibility Score
-# (same formula)
+# Accessibility Score (includes contrast issues)
+deduction = sum(SEVERITY_DEDUCTIONS[v.severity] for v in contrast_issues + accessibility_issues)
+accessibility_score = max(0, base - deduction)
+
+# UX Score (includes rule violations)
+deduction = sum(SEVERITY_DEDUCTIONS[v.severity] for v in ux_issues + rule_violations)
+ux_score = max(0, base - deduction)
 
 # Interaction Score
 success_rate = successful_interactions / total_interactions * 100
 
 # Overall Score
 overall = (layout * 0.3) + (accessibility * 0.4) + (interaction * 0.3)
+ux_penalty = (100 - ux_score) * 0.15
+overall = max(0, overall - ux_penalty)
 ```
 
 **Severity Deductions:**

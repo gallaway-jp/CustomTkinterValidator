@@ -141,6 +141,11 @@ def contrast_ratio(L1, L2):
 - Uses `customtkinter.get_appearance_mode()` to resolve
 - Handles #RGB, #RRGGBB, #RRRGGGBBB formats
 
+**Three Check Levels:**
+- WCAG AA (4.5:1 normal, 3:1 large) — severity: critical/high
+- WCAG AAA (7:1 normal, 4.5:1 large) — severity: low
+- Non-text contrast (3:1 for interactive elements per §1.4.11) — severity: medium
+
 #### Accessibility Checker (`analyzer/accessibility_checker.py`)
 Keyboard navigation and semantic structure validation.
 
@@ -161,6 +166,40 @@ Keyboard navigation and semantic structure validation.
 - Compares label count vs entry count
 - Flags entries where labels < entries
 
+**Additional Checks:**
+- Small text detection (font size below `min_font_size_pt`)
+- Tab vs visual order mismatch (tab order diverges from top-to-bottom, left-to-right reading order)
+
+#### UX Analyzer (`analyzer/ux_analyzer.py`)
+Heuristic analysis of common UX anti-patterns.
+
+**13 Checks:**
+- `cognitive_overload`: Container with too many widgets (exceeds `max_widgets_per_container`)
+- `duplicate_button_label`: Multiple buttons with identical text in same container
+- `long_button_text`: Button label exceeds `max_button_text_length` characters
+- `inconsistent_button_casing`: Sibling buttons using mixed text casing styles
+- `missing_placeholder`: Entry field without placeholder text
+- `orphaned_label`: Label not adjacent to any interactive widget
+- `single_child_container`: Frame with a single child (unnecessary nesting)
+- `missing_window_title`: Top-level window without a title
+- `empty_selection_widget`: ComboBox/OptionMenu with no values
+- `ungrouped_radio_button`: RadioButton not inside a grouping frame
+- `no_primary_action`: Container with buttons but none visually distinguished
+- `button_no_command`: Button without a command callback bound
+- `deep_single_nesting`: Chain of single-child containers
+
+#### Consistency Checker (`analyzer/consistency_checker.py`)
+Cross-widget visual consistency analysis.
+
+**7 Checks:**
+- `inconsistent_button_size`: Sibling buttons with significantly different dimensions
+- `inconsistent_entry_width`: Sibling entries with significantly different widths
+- `inconsistent_font`: Widgets of the same type using different fonts
+- `inconsistent_padding`: Same widget type with different padding within a container
+- `inconsistent_corner_radius`: Siblings with different corner radii
+- `mixed_layout_managers`: Siblings using different layout managers (grid vs pack)
+- `inconsistent_spacing`: Varying gaps between adjacent siblings
+
 ### 3. Reporting Layer
 
 #### Rule Engine (`reporting/rule_engine.py`)
@@ -171,6 +210,8 @@ Pluggable validation rules.
 - `empty_text_button`: Buttons with no text
 - `excessive_nesting`: Widget tree depth > threshold
 - `zero_dimension_widget`: Widgets with width/height = 0
+- `disabled_without_reason`: Disabled widget with no nearby explanatory label
+- `text_content_quality`: Placeholder-style text ("Label", "Button", "test", "todo")
 
 **Custom Rule Interface:**
 ```python
@@ -198,6 +239,9 @@ Assembles the final report.
   "layout_violations": [...],
   "contrast_issues": [...],
   "accessibility_issues": [...],
+  "ux_issues": [...],
+  "consistency_issues": [...],
+  "rule_violations": [...],
   "interaction_results": [...],
   "summary_score": {...}
 }
@@ -212,6 +256,8 @@ def _compute_category_score(violations, base=100):
     )
     return max(0, base - total)
 ```
+
+The overall score combines layout (30%), accessibility (30%), and interaction (30%) with a 15% UX penalty adjustment.
 
 ### 4. Core Layer
 
@@ -280,6 +326,8 @@ TreeExtractor.extract(root)
 LayoutMetrics.analyse(tree) → violations
 ContrastChecker.check(tree) → issues
 AccessibilityChecker.check(tree) → issues
+UXAnalyzer.analyse(tree) → ux_issues
+ConsistencyChecker.check(tree) → consistency_issues
 RuleEngine.evaluate(tree) → violations
   ↓
 JSONSerializer.build_report(...)
@@ -336,6 +384,8 @@ The validator is **not thread-safe** by design:
 3. **Custom Widgets**: Use `TestableWidget` mixin
 4. **Custom Config**: Extend `ValidatorConfig` dataclass
 5. **Custom Serializers**: Implement `build_report()` method
+6. **UX Heuristics**: Add checks to `UXAnalyzer`
+7. **Consistency Rules**: Add checks to `ConsistencyChecker`
 
 ## Error Handling Strategy
 

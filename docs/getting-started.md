@@ -98,7 +98,9 @@ import json
 data = json.load(open('my_app_report.json'))
 print('Score:', data['summary_score']['overall_score'])
 print('Issues:', len(data['contrast_issues']), 'contrast,',
-                 len(data['accessibility_issues']), 'accessibility')
+                 len(data['accessibility_issues']), 'accessibility,',
+                 len(data['ux_issues']), 'UX,',
+                 len(data['consistency_issues']), 'consistency')
 "
 ```
 
@@ -163,8 +165,9 @@ WCAG 2.1 violations:
 {
   "layout_score": 75.0,
   "accessibility_score": 85.0,
+  "ux_score": 70.0,
   "interaction_score": 100.0,
-  "overall_score": 86.0
+  "overall_score": 82.0
 }
 ```
 

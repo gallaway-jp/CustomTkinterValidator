@@ -158,6 +158,8 @@ class LayoutMetrics:
         violations.extend(self._check_touch_targets(flat))
         violations.extend(self._check_alignment(flat))
         violations.extend(self._check_symmetry(flat))
+        violations.extend(self._check_widget_outside_bounds(flat))
+        violations.extend(self._check_content_truncation_risk(flat))
         return violations
 
     def compute_spacing(self, widget_tree: dict[str, Any]) -> list[dict[str, Any]]:
@@ -488,6 +490,133 @@ class LayoutMetrics:
                                 threshold=float(tolerance),
                             )
                         )
+        return violations
+
+    def _check_widget_outside_bounds(
+        self, flat: list[dict[str, Any]]
+    ) -> list[LayoutViolation]:
+        """Detect child widgets extending beyond their parent's bounding box.
+
+        Args:
+            flat: Flat list of widget nodes.
+
+        Returns:
+            Out-of-bounds violations.
+        """
+        violations: list[LayoutViolation] = []
+        tolerance = self._config.widget_outside_bounds_tolerance_px
+
+        node_map = {n.get("test_id"): n for n in flat}
+
+        for node in flat:
+            parent_id = node.get("parent_id")
+            if parent_id is None:
+                continue
+            parent = node_map.get(parent_id)
+            if parent is None:
+                continue
+            pw = parent.get("width", 0)
+            ph = parent.get("height", 0)
+            if pw <= 0 or ph <= 0:
+                continue
+
+            w = node.get("width", 0)
+            h = node.get("height", 0)
+            if w <= 0 or h <= 0:
+                continue
+
+            child_right = node.get("abs_x", 0) + w
+            child_bottom = node.get("abs_y", 0) + h
+            parent_right = parent.get("abs_x", 0) + pw
+            parent_bottom = parent.get("abs_y", 0) + ph
+
+            overflow_right = child_right - parent_right
+            overflow_bottom = child_bottom - parent_bottom
+            overflow_left = parent.get("abs_x", 0) - node.get("abs_x", 0)
+            overflow_top = parent.get("abs_y", 0) - node.get("abs_y", 0)
+
+            max_overflow = max(overflow_right, overflow_bottom, overflow_left, overflow_top)
+            if max_overflow > tolerance:
+                violations.append(
+                    LayoutViolation(
+                        rule_id="widget_outside_bounds",
+                        severity="medium",
+                        widget_id=node.get("test_id", "unknown"),
+                        related_widget_id=parent_id,
+                        description=(
+                            f"Widget '{node.get('test_id')}' extends "
+                            f"{max_overflow}px beyond its parent "
+                            f"'{parent_id}' bounds"
+                        ),
+                        recommended_fix=(
+                            f"Resize or reposition '{node.get('test_id')}' to "
+                            f"fit within '{parent_id}', or expand the parent"
+                        ),
+                        measured_value=float(max_overflow),
+                        threshold=float(tolerance),
+                    )
+                )
+        return violations
+
+    def _check_content_truncation_risk(
+        self, flat: list[dict[str, Any]]
+    ) -> list[LayoutViolation]:
+        """Flag text widgets whose text length suggests possible truncation.
+
+        Uses a rough estimate: if text characters × 8px exceeds the widget
+        width, the text may be clipped.
+
+        Args:
+            flat: Flat list of widget nodes.
+
+        Returns:
+            Truncation-risk violations.
+        """
+        violations: list[LayoutViolation] = []
+        label_types = {"CTkLabel", "TLabel", "Label", "CTkButton", "TButton", "Button"}
+
+        for node in flat:
+            wtype = node.get("widget_type", "")
+            if wtype not in label_types:
+                continue
+            text = node.get("text") or ""
+            if not text or len(text) < 5:
+                continue
+            w = node.get("width", 0)
+            if w <= 0:
+                continue
+            # Rough per-character width: 8px average for typical font size
+            font_size = node.get("font_size")
+            char_width = 8
+            if font_size:
+                try:
+                    char_width = max(5, abs(int(font_size)) * 0.6)
+                except (ValueError, TypeError):
+                    pass
+            estimated_text_width = len(text) * char_width
+            # Add some padding for widget internal padding
+            available = w - 16  # 8px padding on each side
+            if available > 0 and estimated_text_width > available * 1.2:
+                violations.append(
+                    LayoutViolation(
+                        rule_id="content_truncation_risk",
+                        severity="low",
+                        widget_id=node.get("test_id", "unknown"),
+                        related_widget_id=None,
+                        description=(
+                            f"Widget '{node.get('test_id')}' text "
+                            f"('{text[:30]}{'...' if len(text) > 30 else ''}') "
+                            f"may be truncated: estimated width ~{estimated_text_width:.0f}px "
+                            f"vs available ~{available:.0f}px"
+                        ),
+                        recommended_fix=(
+                            f"Increase the width of '{node.get('test_id')}' or "
+                            f"shorten its text to prevent truncation"
+                        ),
+                        measured_value=float(estimated_text_width),
+                        threshold=float(available),
+                    )
+                )
         return violations
 
     def _compute_sibling_spacing(

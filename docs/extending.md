@@ -2,7 +2,17 @@
 
 ## Custom Validation Rules
 
-Add custom rules via the `RuleEngine`:
+Add custom rules via the `RuleEngine`.
+
+The validator ships with 6 built-in rules:
+- `hidden_interactive` — interactive widgets not visible
+- `empty_text_button` — buttons with no label text
+- `excessive_nesting` — tree depth exceeds threshold
+- `zero_dimension_widget` — widgets with width/height = 0
+- `disabled_without_reason` — disabled widgets with no nearby explanatory label
+- `text_content_quality` — placeholder-style text ("Label", "Button", "test")
+
+You can add your own:
 
 ```python
 from customtkinter_validator.core.runner import TestRunner
@@ -86,7 +96,15 @@ class TMyWidget(ctk.CTkComboBox):
 
 ## Custom Analyzers
 
-Create analyzers that implement the interface:
+The validator includes 6 built-in analyzers:
+- **TreeExtractor** — widget metadata extraction (30+ fields per widget)
+- **LayoutMetrics** — spatial analysis (7 checks)
+- **ContrastChecker** — WCAG contrast (AA, AAA, non-text)
+- **AccessibilityChecker** — keyboard navigation and semantics (6 checks)
+- **UXAnalyzer** — UX heuristics (13 checks)
+- **ConsistencyChecker** — visual consistency (7 checks)
+
+Create custom analyzers that implement the same interface:
 
 ```python
 class CustomAnalyzer:

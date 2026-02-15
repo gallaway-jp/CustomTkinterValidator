@@ -6,6 +6,21 @@ A deterministic, introspection-based tool that injects into running CustomTkinte
 
 ---
 
+## What It Detects
+
+The validator runs **6 analyser categories** producing detailed, actionable findings:
+
+| Category | # Checks | Examples |
+|---|---|---|
+| **Layout** | 7 | Overlap, spacing, touch targets, alignment, symmetry, widget-out-of-bounds, truncation risk |
+| **Contrast** | 3 | WCAG AA (4.5:1), WCAG AAA (7:1), non-text contrast (3:1) |
+| **Accessibility** | 6 | Missing labels, disabled primary actions, unreachable focusables, focus chain, small text, tab-vs-visual order |
+| **UX Heuristics** | 13 | Cognitive overload, duplicate buttons, long button text, orphaned labels, missing placeholders, ungrouped radios, no primary action, button without command, etc. |
+| **Consistency** | 7 | Inconsistent button/entry sizes, fonts, padding, corner radius, spacing, mixed layout managers |
+| **Rules** | 6 | Hidden interactive, empty text buttons, excessive nesting, zero-dimension, disabled without reason, placeholder text quality |
+
+---
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -94,9 +109,11 @@ customtkinter_validator/
 │   └── event_simulator.py   # Deterministic event generation
 ├── analyzer/
 │   ├── tree_extractor.py    # Full widget metadata extraction
-│   ├── layout_metrics.py    # Spatial analysis (overlap, spacing, alignment)
-│   ├── contrast_checker.py  # WCAG 2.1 contrast ratio computation
-│   └── accessibility_checker.py  # Focus chain, labels, disabled actions
+│   ├── layout_metrics.py    # Spatial analysis (overlap, spacing, alignment, bounds, truncation)
+│   ├── contrast_checker.py  # WCAG 2.1 AA/AAA + non-text contrast
+│   ├── accessibility_checker.py  # Focus chain, labels, disabled actions, text size, tab order
+│   ├── ux_analyzer.py       # UX heuristics (cognitive load, labelling, conventions)
+│   └── consistency_checker.py    # Visual consistency (sizing, fonts, spacing, styling)
 ├── reporting/
 │   ├── rule_engine.py       # Configurable validation rules
 │   └── json_serializer.py   # Canonical JSON output assembly
@@ -113,18 +130,20 @@ App Window
 Injector ──► WidgetRegistry (test_id → widget)
   │
   ▼
-TreeExtractor ──► widget_tree (nested dict)
+TreeExtractor ──► widget_tree (nested dict with 25+ fields per widget)
   │
-  ├─► LayoutMetrics ──► layout_violations
-  ├─► ContrastChecker ──► contrast_issues
-  ├─► AccessibilityChecker ──► accessibility_issues
-  └─► RuleEngine ──► rule_violations
+  ├─► LayoutMetrics ──► layout_violations (overlap, spacing, alignment, bounds, truncation)
+  ├─► ContrastChecker ──► contrast_issues (AA, AAA, non-text)
+  ├─► AccessibilityChecker ──► accessibility_issues (labels, focus, text size, tab order)
+  ├─► UXAnalyzer ──► ux_issues (cognitive load, labelling, conventions)
+  ├─► ConsistencyChecker ──► consistency_issues (sizing, fonts, spacing)
+  └─► RuleEngine ──► rule_violations (configurable rules)
   │
   ▼
 EventSimulator ──► interaction_results
   │
   ▼
-JsonSerializer ──► JSON report
+JsonSerializer ──► JSON report (6 issue categories + scores)
 ```
 
 ### Key Design Decisions
@@ -245,48 +264,89 @@ For large applications (500+ widgets), the overlap detection's O(n²) pairwise c
 {
   "metadata": {
     "tool": "CustomTkinter Validator",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "timestamp": "2026-02-15T12:00:00+00:00",
     "python_version": "3.12.0",
     "platform": "Windows-11-...",
-    "tab_order": ["name_entry", "email_entry", "submit_btn", ...]
+    "tab_order": ["name_entry", "email_entry", "submit_btn"]
   },
   "widget_tree": {
     "widget_type": "CTk",
     "test_id": "CTk_root",
-    "children": [...]
+    "text": null,
+    "placeholder_text": null,
+    "font_family": null,
+    "font_size": null,
+    "font_weight": "normal",
+    "fg_color": "#1a1a2e",
+    "bg_color": "#1a1a2e",
+    "width": 800,
+    "height": 600,
+    "corner_radius": null,
+    "border_width": null,
+    "has_command": false,
+    "has_image": false,
+    "values": null,
+    "layout_manager": "pack",
+    "layout_detail": {"side": "top", "fill": "both", "expand": true, "anchor": "center"},
+    "children": ["..."]
   },
   "layout_violations": [
     {
-      "rule_id": "overlap_detection",
-      "severity": "high",
-      "widget_id": "submit_btn",
-      "related_widget_id": "reset_btn",
+      "rule_id": "overlap_detection | insufficient_padding | small_touch_target | alignment_inconsistency | symmetry_deviation | widget_outside_bounds | content_truncation_risk",
+      "severity": "critical | high | medium | low",
+      "widget_id": "...",
       "description": "...",
       "recommended_fix": "..."
     }
   ],
   "contrast_issues": [
     {
-      "rule_id": "insufficient_contrast",
-      "severity": "critical",
-      "widget_id": "status_label",
+      "rule_id": "insufficient_contrast | insufficient_contrast_aaa | insufficient_non_text_contrast",
+      "severity": "...",
+      "widget_id": "...",
       "fg_color": "#555555",
       "bg_color": "#444444",
       "contrast_ratio": 1.28,
       "required_ratio": 4.5,
-      "wcag_level": "AA",
-      "description": "...",
-      "recommended_fix": "..."
+      "wcag_level": "AA | AAA"
     }
   ],
-  "accessibility_issues": [...],
-  "interaction_results": [...],
+  "accessibility_issues": [
+    {
+      "rule_id": "missing_label | disabled_primary_action | unreachable_focusable | empty_focus_chain | small_text | tab_visual_order_mismatch",
+      "severity": "...",
+      "widget_id": "..."
+    }
+  ],
+  "ux_issues": [
+    {
+      "rule_id": "cognitive_overload | duplicate_button_label | long_button_text | inconsistent_button_casing | missing_placeholder | orphaned_label | single_child_container | missing_window_title | empty_selection_widget | ungrouped_radio_button | no_primary_action | button_no_command | deep_single_nesting",
+      "severity": "...",
+      "widget_id": "..."
+    }
+  ],
+  "consistency_issues": [
+    {
+      "rule_id": "inconsistent_button_size | inconsistent_entry_width | inconsistent_font | inconsistent_padding | inconsistent_corner_radius | mixed_layout_managers | inconsistent_spacing",
+      "severity": "...",
+      "widget_id": "..."
+    }
+  ],
+  "rule_violations": [
+    {
+      "rule_id": "hidden_interactive | empty_text_button | excessive_nesting | zero_dimension_widget | disabled_without_reason | text_content_quality",
+      "severity": "...",
+      "widget_id": "..."
+    }
+  ],
+  "interaction_results": ["..."],
   "summary_score": {
     "layout_score": 70.0,
     "accessibility_score": 50.0,
+    "ux_score": 85.0,
     "interaction_score": 87.5,
-    "overall_score": 66.25
+    "overall_score": 63.75
   }
 }
 ```
@@ -295,4 +355,4 @@ For large applications (500+ widgets), the overlap detection's O(n²) pairwise c
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE) for details.

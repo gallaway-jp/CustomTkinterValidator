@@ -134,6 +134,116 @@ class ContrastChecker:
                         ),
                     )
                 )
+            elif ratio < (
+                self._config.min_contrast_ratio_aaa_large
+                if is_large
+                else self._config.min_contrast_ratio_aaa_normal
+            ):
+                aaa_required = (
+                    self._config.min_contrast_ratio_aaa_large
+                    if is_large
+                    else self._config.min_contrast_ratio_aaa_normal
+                )
+                issues.append(
+                    ContrastIssue(
+                        rule_id="insufficient_contrast_aaa",
+                        severity="low",
+                        widget_id=node.get("test_id", "unknown"),
+                        fg_color=fg,
+                        bg_color=bg,
+                        contrast_ratio=ratio,
+                        required_ratio=aaa_required,
+                        wcag_level="AAA",
+                        description=(
+                            f"'{node.get('test_id')}' passes WCAG AA but fails "
+                            f"AAA: contrast ratio {ratio:.2f}:1 "
+                            f"(AAA requires {aaa_required}:1 for "
+                            f"{'large' if is_large else 'normal'} text)"
+                        ),
+                        recommended_fix=(
+                            f"For enhanced accessibility, improve contrast of "
+                            f"'{node.get('test_id')}' to at least {aaa_required}:1"
+                        ),
+                    )
+                )
+
+        # Check non-text contrast for interactive elements
+        issues.extend(self._check_non_text_contrast(flat))
+        return issues
+
+    def _check_non_text_contrast(
+        self, flat: list[dict[str, Any]]
+    ) -> list[ContrastIssue]:
+        """Check non-text contrast for interactive UI elements (WCAG 2.1 §1.4.11).
+
+        Interactive elements and their borders must have at least 3:1 contrast
+        against their adjacent background.
+
+        Args:
+            flat: Flat list of widget nodes.
+
+        Returns:
+            List of non-text contrast issues.
+        """
+        issues: list[ContrastIssue] = []
+        interactive_types = {
+            "CTkButton", "CTkEntry", "CTkCheckBox", "CTkSwitch",
+            "CTkRadioButton", "CTkSlider", "CTkOptionMenu", "CTkComboBox",
+            "TButton", "TEntry", "TCheckBox", "TSwitch",
+            "TRadioButton", "TSlider", "TOptionMenu", "TComboBox",
+        }
+        required = self._config.min_contrast_non_text
+        node_map = {n.get("test_id"): n for n in flat}
+
+        for node in flat:
+            wtype = node.get("widget_type", "")
+            if wtype not in interactive_types:
+                continue
+
+            widget_bg = node.get("bg_color")
+            if not widget_bg:
+                continue
+
+            parent_id = node.get("parent_id")
+            parent = node_map.get(parent_id) if parent_id else None
+            if parent is None:
+                continue
+
+            parent_bg = parent.get("bg_color")
+            if not parent_bg:
+                continue
+
+            widget_rgb = self._hex_to_rgb(widget_bg)
+            parent_rgb = self._hex_to_rgb(parent_bg)
+            if widget_rgb is None or parent_rgb is None:
+                continue
+
+            ratio = self.contrast_ratio(widget_rgb, parent_rgb)
+            if ratio < required:
+                issues.append(
+                    ContrastIssue(
+                        rule_id="insufficient_non_text_contrast",
+                        severity="medium",
+                        widget_id=node.get("test_id", "unknown"),
+                        fg_color=widget_bg,
+                        bg_color=parent_bg,
+                        contrast_ratio=ratio,
+                        required_ratio=required,
+                        wcag_level="AA",
+                        description=(
+                            f"Interactive element '{node.get('test_id')}' has "
+                            f"non-text contrast ratio {ratio:.2f}:1 against "
+                            f"its parent background (required: {required}:1 "
+                            f"per WCAG 2.1 §1.4.11)"
+                        ),
+                        recommended_fix=(
+                            f"Increase the visual contrast between "
+                            f"'{node.get('test_id')}' and its parent background "
+                            f"to at least {required}:1 by adjusting colours or "
+                            f"adding a visible border"
+                        ),
+                    )
+                )
         return issues
 
     @staticmethod

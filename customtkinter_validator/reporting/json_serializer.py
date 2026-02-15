@@ -12,9 +12,11 @@ import platform
 from pathlib import Path
 from typing import Any
 
+from customtkinter_validator.analyzer.accessibility_checker import AccessibilityIssue
+from customtkinter_validator.analyzer.consistency_checker import ConsistencyIssue
 from customtkinter_validator.analyzer.contrast_checker import ContrastIssue
 from customtkinter_validator.analyzer.layout_metrics import LayoutViolation
-from customtkinter_validator.analyzer.accessibility_checker import AccessibilityIssue
+from customtkinter_validator.analyzer.ux_analyzer import UXIssue
 from customtkinter_validator.core.config import ValidatorConfig
 from customtkinter_validator.reporting.rule_engine import RuleViolation
 from customtkinter_validator.test_harness.event_simulator import InteractionResult
@@ -57,6 +59,8 @@ class JsonSerializer:
         layout_violations: list[LayoutViolation],
         contrast_issues: list[ContrastIssue],
         accessibility_issues: list[AccessibilityIssue],
+        ux_issues: list[UXIssue],
+        consistency_issues: list[ConsistencyIssue],
         rule_violations: list[RuleViolation],
         interaction_results: list[InteractionResult],
         tab_order: list[str],
@@ -68,6 +72,8 @@ class JsonSerializer:
             layout_violations: Detected layout problems.
             contrast_issues: Detected contrast problems.
             accessibility_issues: Detected accessibility problems.
+            ux_issues: Detected UX heuristic problems.
+            consistency_issues: Detected visual consistency problems.
             rule_violations: Custom rule violations.
             interaction_results: Event simulation outcomes.
             tab_order: Computed keyboard tab order.
@@ -77,10 +83,15 @@ class JsonSerializer:
         """
         layout_score = self._compute_category_score(
             [v.to_dict() for v in layout_violations]
+            + [v.to_dict() for v in consistency_issues]
         )
         accessibility_score = self._compute_category_score(
             [v.to_dict() for v in contrast_issues]
             + [v.to_dict() for v in accessibility_issues]
+        )
+        ux_score = self._compute_category_score(
+            [v.to_dict() for v in ux_issues]
+            + [v.to_dict() for v in rule_violations]
         )
         interaction_score = self._compute_interaction_score(interaction_results)
 
@@ -89,6 +100,9 @@ class JsonSerializer:
             + self._config.score_weight_accessibility * accessibility_score
             + self._config.score_weight_interaction * interaction_score
         )
+        # Adjust overall score by UX penalty
+        ux_penalty = (100.0 - ux_score) * 0.15  # 15% weight for UX issues
+        overall_score = max(0.0, overall_score - ux_penalty)
 
         return {
             "metadata": self._build_metadata(tab_order),
@@ -97,12 +111,15 @@ class JsonSerializer:
             "contrast_issues": [v.to_dict() for v in contrast_issues],
             "accessibility_issues": (
                 [v.to_dict() for v in accessibility_issues]
-                + [v.to_dict() for v in rule_violations]
             ),
+            "ux_issues": [v.to_dict() for v in ux_issues],
+            "consistency_issues": [v.to_dict() for v in consistency_issues],
+            "rule_violations": [v.to_dict() for v in rule_violations],
             "interaction_results": [r.to_dict() for r in interaction_results],
             "summary_score": {
                 "layout_score": round(layout_score, 2),
                 "accessibility_score": round(accessibility_score, 2),
+                "ux_score": round(ux_score, 2),
                 "interaction_score": round(interaction_score, 2),
                 "overall_score": round(overall_score, 2),
             },
@@ -147,7 +164,7 @@ class JsonSerializer:
         """
         return {
             "tool": "CustomTkinter Validator",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "timestamp": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(),
             "python_version": platform.python_version(),
             "platform": platform.platform(),

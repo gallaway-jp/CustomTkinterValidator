@@ -104,6 +104,8 @@ class AccessibilityChecker:
         issues.extend(self._check_disabled_primary_actions(flat))
         issues.extend(self._check_unreachable_focusables(flat))
         issues.extend(self._check_focus_chain())
+        issues.extend(self._check_small_text(flat))
+        issues.extend(self._check_tab_visual_order_mismatch(flat))
         return issues
 
     def compute_tab_order(self) -> list[str]:
@@ -370,6 +372,120 @@ class AccessibilityChecker:
                     recommended_fix=(
                         "Ensure at least one interactive widget exists and is "
                         "focusable via keyboard"
+                    ),
+                )
+            )
+        return issues
+
+    def _check_small_text(
+        self, flat: list[dict[str, Any]]
+    ) -> list[AccessibilityIssue]:
+        """Flag widgets with text below the minimum readable font size.
+
+        Args:
+            flat: Flat list of widget metadata.
+
+        Returns:
+            List of small-text issues.
+        """
+        issues: list[AccessibilityIssue] = []
+        min_size = self._config.min_font_size_pt
+
+        for node in flat:
+            text = node.get("text") or ""
+            if not text:
+                continue
+            font_size = node.get("font_size")
+            if font_size is None:
+                continue
+            try:
+                size = abs(int(font_size))
+            except (ValueError, TypeError):
+                continue
+            if 0 < size < min_size:
+                issues.append(
+                    AccessibilityIssue(
+                        rule_id="small_text",
+                        severity="medium",
+                        widget_id=node.get("test_id", "unknown"),
+                        description=(
+                            f"Widget '{node.get('test_id')}' uses a "
+                            f"{size}pt font, below the minimum readable size "
+                            f"of {min_size}pt"
+                        ),
+                        recommended_fix=(
+                            f"Increase the font size of '{node.get('test_id')}' "
+                            f"to at least {min_size}pt for readability"
+                        ),
+                    )
+                )
+        return issues
+
+    def _check_tab_visual_order_mismatch(
+        self, flat: list[dict[str, Any]]
+    ) -> list[AccessibilityIssue]:
+        """Flag cases where tab order doesn't match visual order.
+
+        Compares the computed tab order against the visual (top-to-bottom,
+        left-to-right) order. Large deviations confuse keyboard users.
+
+        Args:
+            flat: Flat list of widget metadata.
+
+        Returns:
+            List of tab-visual-order issues.
+        """
+        issues: list[AccessibilityIssue] = []
+        tab_order = self.compute_tab_order()
+        if len(tab_order) < 3:
+            return issues
+
+        tolerance = self._config.tab_visual_order_tolerance_px
+
+        # Build visual order from geometry
+        id_to_pos: dict[str, tuple[int, int]] = {}
+        for node in flat:
+            tid = node.get("test_id", "")
+            if tid in tab_order:
+                id_to_pos[tid] = (node.get("abs_y", 0), node.get("abs_x", 0))
+
+        if len(id_to_pos) < 3:
+            return issues
+
+        visual_order = sorted(id_to_pos, key=lambda tid: id_to_pos[tid])
+        tab_filtered = [tid for tid in tab_order if tid in id_to_pos]
+
+        # Compare positions — flag large jumps in tab order
+        mismatches: list[str] = []
+        for i, tid in enumerate(tab_filtered):
+            if tid not in visual_order:
+                continue
+            vis_idx = visual_order.index(tid)
+            if abs(i - vis_idx) > 2:
+                # Check if the position difference is significant
+                vy, vx = id_to_pos.get(tid, (0, 0))
+                expected = visual_order[min(i, len(visual_order) - 1)]
+                ey, ex = id_to_pos.get(expected, (0, 0))
+                dist = abs(vy - ey) + abs(vx - ex)
+                if dist > tolerance:
+                    mismatches.append(tid)
+
+        if mismatches:
+            issues.append(
+                AccessibilityIssue(
+                    rule_id="tab_visual_order_mismatch",
+                    severity="medium",
+                    widget_id=mismatches[0],
+                    description=(
+                        f"Tab navigation order does not match visual layout "
+                        f"for {len(mismatches)} widget(s): "
+                        f"{', '.join(mismatches[:5])}. This may confuse "
+                        f"keyboard users."
+                    ),
+                    recommended_fix=(
+                        f"Adjust the widget creation order or use "
+                        f"widget.lift()/widget.lower() to align tab order "
+                        f"with visual layout"
                     ),
                 )
             )

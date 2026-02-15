@@ -16,6 +16,9 @@ class ValidatorConfig:
     Attributes:
         min_contrast_ratio_normal: WCAG AA minimum contrast for normal text (4.5:1).
         min_contrast_ratio_large: WCAG AA minimum contrast for large text (3:1).
+        min_contrast_ratio_aaa_normal: WCAG AAA minimum contrast for normal text (7:1).
+        min_contrast_ratio_aaa_large: WCAG AAA minimum contrast for large text (4.5:1).
+        min_contrast_non_text: WCAG 2.1 minimum contrast for non-text UI elements (3:1).
         large_text_threshold_pt: Font size in points above which text is "large".
         large_text_bold_threshold_pt: Bold font size threshold for "large" text.
         min_touch_target_px: Minimum interactive widget dimension in pixels.
@@ -23,6 +26,12 @@ class ValidatorConfig:
         overlap_tolerance_px: Pixel tolerance before flagging overlap.
         alignment_tolerance_px: Pixel tolerance for alignment consistency checks.
         symmetry_tolerance_px: Pixel tolerance for basic symmetry detection.
+        min_font_size_pt: Minimum readable font size in points.
+        max_widgets_per_container: Maximum widgets in a container before cognitive overload.
+        max_button_text_length: Maximum character count for button labels.
+        inconsistent_size_tolerance_pct: Percentage tolerance for sibling size consistency.
+        widget_outside_bounds_tolerance_px: Pixels allowed outside parent bounds.
+        tab_visual_order_tolerance_px: Pixel tolerance for tab-order vs visual-order comparison.
         score_weight_layout: Weight for layout score in overall score.
         score_weight_accessibility: Weight for accessibility score in overall score.
         score_weight_interaction: Weight for interaction score in overall score.
@@ -35,6 +44,9 @@ class ValidatorConfig:
 
     min_contrast_ratio_normal: float = 4.5
     min_contrast_ratio_large: float = 3.0
+    min_contrast_ratio_aaa_normal: float = 7.0
+    min_contrast_ratio_aaa_large: float = 4.5
+    min_contrast_non_text: float = 3.0
     large_text_threshold_pt: int = 18
     large_text_bold_threshold_pt: int = 14
     min_touch_target_px: int = 24
@@ -42,6 +54,12 @@ class ValidatorConfig:
     overlap_tolerance_px: int = 0
     alignment_tolerance_px: int = 3
     symmetry_tolerance_px: int = 10
+    min_font_size_pt: int = 9
+    max_widgets_per_container: int = 12
+    max_button_text_length: int = 30
+    inconsistent_size_tolerance_pct: float = 50.0
+    widget_outside_bounds_tolerance_px: int = 2
+    tab_visual_order_tolerance_px: int = 20
     score_weight_layout: float = 0.30
     score_weight_accessibility: float = 0.40
     score_weight_interaction: float = 0.30

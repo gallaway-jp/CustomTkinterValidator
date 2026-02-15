@@ -11,9 +11,11 @@ from pathlib import Path
 from typing import Any, Callable
 
 from customtkinter_validator.analyzer.accessibility_checker import AccessibilityChecker
+from customtkinter_validator.analyzer.consistency_checker import ConsistencyChecker
 from customtkinter_validator.analyzer.contrast_checker import ContrastChecker
 from customtkinter_validator.analyzer.layout_metrics import LayoutMetrics
 from customtkinter_validator.analyzer.tree_extractor import TreeExtractor
+from customtkinter_validator.analyzer.ux_analyzer import UXAnalyzer
 from customtkinter_validator.core.config import ValidatorConfig
 from customtkinter_validator.reporting.json_serializer import JsonSerializer
 from customtkinter_validator.reporting.rule_engine import RuleEngine
@@ -53,6 +55,8 @@ class TestRunner:
         self._layout_metrics = LayoutMetrics(self._config)
         self._contrast_checker = ContrastChecker(self._config)
         self._accessibility_checker = AccessibilityChecker(self._registry, self._config)
+        self._ux_analyzer = UXAnalyzer(self._config)
+        self._consistency_checker = ConsistencyChecker(self._config)
         self._rule_engine = RuleEngine(self._config)
         self._serializer = JsonSerializer(self._config)
         self._root: tk.Misc | None = None
@@ -142,6 +146,8 @@ class TestRunner:
         layout_violations = self._layout_metrics.analyse(widget_tree)
         contrast_issues = self._contrast_checker.check(widget_tree)
         accessibility_issues = self._accessibility_checker.check(widget_tree)
+        ux_issues = self._ux_analyzer.analyse(widget_tree)
+        consistency_issues = self._consistency_checker.check(widget_tree)
         rule_violations = self._rule_engine.evaluate(widget_tree)
         tab_order = self._accessibility_checker.compute_tab_order()
 
@@ -150,6 +156,8 @@ class TestRunner:
             layout_violations=layout_violations,
             contrast_issues=contrast_issues,
             accessibility_issues=accessibility_issues,
+            ux_issues=ux_issues,
+            consistency_issues=consistency_issues,
             rule_violations=rule_violations,
             interaction_results=self._simulator.results,
             tab_order=tab_order,

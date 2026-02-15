@@ -184,6 +184,20 @@ class RuleEngine:
                 enabled=True,
                 check=self._rule_zero_dimension,
             ),
+            Rule(
+                rule_id="disabled_without_reason",
+                name="Disabled Without Nearby Explanation",
+                description="Disabled widgets should have nearby text explaining why",
+                enabled=True,
+                check=self._rule_disabled_without_reason,
+            ),
+            Rule(
+                rule_id="text_content_quality",
+                name="Text Content Quality",
+                description="Labels and buttons should have meaningful text",
+                enabled=True,
+                check=self._rule_text_content_quality,
+            ),
         ])
 
     @staticmethod
@@ -341,6 +355,124 @@ class RuleEngine:
                         recommended_fix=(
                             f"Ensure '{node.get('test_id')}' has a size set "
                             f"either explicitly or via its layout manager"
+                        ),
+                    )
+                )
+        return violations
+
+    @staticmethod
+    def _rule_disabled_without_reason(tree: dict[str, Any]) -> list[RuleViolation]:
+        """Flag disabled widgets with no nearby explanatory text.
+
+        When a widget is disabled, there should be a visible label or
+        tooltip explaining why.
+
+        Args:
+            tree: Widget tree.
+
+        Returns:
+            Violations.
+        """
+        interactive = {
+            "CTkButton", "CTkEntry", "CTkCheckBox", "CTkSwitch",
+            "CTkRadioButton", "CTkSlider", "CTkOptionMenu", "CTkComboBox",
+            "TButton", "TEntry", "TCheckBox",
+            "Button", "Entry", "Checkbutton",
+        }
+        label_types = {"CTkLabel", "TLabel", "Label"}
+        violations: list[RuleViolation] = []
+
+        flat = RuleEngine._flatten(tree)
+        # Collect labels by parent
+        labels_by_parent: dict[str | None, list[str]] = {}
+        for node in flat:
+            if node.get("widget_type", "") in label_types:
+                text = (node.get("text") or "").lower()
+                parent = node.get("parent_id")
+                labels_by_parent.setdefault(parent, []).append(text)
+
+        for node in flat:
+            wtype = node.get("widget_type", "")
+            if wtype not in interactive:
+                continue
+            if node.get("enabled", True):
+                continue
+            # Check if any sibling label mentions disabled/unavailable/required/etc.
+            parent = node.get("parent_id")
+            sibling_labels = labels_by_parent.get(parent, [])
+            hint_keywords = {
+                "disabled", "unavailable", "locked", "required",
+                "must", "need", "first", "before", "not available",
+            }
+            has_explanation = any(
+                any(kw in label for kw in hint_keywords)
+                for label in sibling_labels
+            )
+            if not has_explanation:
+                violations.append(
+                    RuleViolation(
+                        rule_id="disabled_without_reason",
+                        severity="low",
+                        widget_id=node.get("test_id", "unknown"),
+                        description=(
+                            f"Widget '{node.get('test_id')}' is disabled but "
+                            f"there is no nearby text explaining why"
+                        ),
+                        recommended_fix=(
+                            f"Add a label or tooltip near '{node.get('test_id')}' "
+                            f"explaining why it is disabled and what the user "
+                            f"needs to do to enable it"
+                        ),
+                    )
+                )
+        return violations
+
+    @staticmethod
+    def _rule_text_content_quality(tree: dict[str, Any]) -> list[RuleViolation]:
+        """Flag widgets with low-quality text content.
+
+        Detects single-character labels (not icons), placeholder-style labels
+        like 'Label' or 'Button', and labels that are just numbers.
+
+        Args:
+            tree: Widget tree.
+
+        Returns:
+            Violations.
+        """
+        text_types = {
+            "CTkButton", "TButton", "Button",
+            "CTkLabel", "TLabel", "Label",
+        }
+        placeholder_texts = {
+            "label", "button", "text", "title", "header",
+            "ctkbutton", "ctklabel", "untitled", "placeholder",
+            "test", "todo", "fixme", "xxx",
+        }
+        violations: list[RuleViolation] = []
+        for node in RuleEngine._flatten(tree):
+            wtype = node.get("widget_type", "")
+            if wtype not in text_types:
+                continue
+            text = (node.get("text") or "").strip()
+            if not text:
+                continue
+
+            text_lower = text.lower()
+            if text_lower in placeholder_texts:
+                violations.append(
+                    RuleViolation(
+                        rule_id="text_content_quality",
+                        severity="medium",
+                        widget_id=node.get("test_id", "unknown"),
+                        description=(
+                            f"Widget '{node.get('test_id')}' has placeholder-style "
+                            f"text '{text}' that appears to be a development-time "
+                            f"default"
+                        ),
+                        recommended_fix=(
+                            f"Replace '{text}' in '{node.get('test_id')}' with "
+                            f"meaningful, descriptive text"
                         ),
                     )
                 )

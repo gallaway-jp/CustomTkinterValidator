@@ -6,8 +6,9 @@ CustomTkinter Validator is designed from the ground up for AI agent consumption.
 
 1. **Understand the UI structure** via complete widget trees
 2. **Identify UX issues** with severity ratings and fix recommendations
-3. **Generate contextual fixes** using widget metadata and spatial relationships
-4. **Validate fixes** by re-running analysis and comparing scores
+3. **Detect visual inconsistencies** across similar widgets
+4. **Generate contextual fixes** using widget metadata and spatial relationships
+5. **Validate fixes** by re-running analysis and comparing scores
 
 ## AI Agent Workflow
 
@@ -29,8 +30,8 @@ CustomTkinter Validator is designed from the ground up for AI agent consumption.
 │  3. AI analyzes report and generates fixes               │
 │     • Contrast: Change colors to meet WCAG               │
 │     • Layout: Adjust padding/alignment                   │
-│     • Accessibility: Add labels, fix tab order           │
-└────────────────┬─────────────────────────────────────────┘
+│     • Accessibility: Add labels, fix tab order           ││     • UX: Fix cognitive overload, add placeholders       │
+│     • Consistency: Unify sizes, fonts, spacing            │└────────────────┬─────────────────────────────────────────┘
                  │
                  ▼
 ┌──────────────────────────────────────────────────────────┐
@@ -100,6 +101,14 @@ Each issue includes:
 - `description`: Human-readable explanation
 - `recommended_fix`: Actionable suggestion
 - Context data (measured values, thresholds)
+
+**Six Issue Categories:**
+- `layout_violations` — overlap, alignment, padding, touch targets, symmetry, bounds, truncation
+- `contrast_issues` — WCAG AA, AAA, and non-text contrast
+- `accessibility_issues` — missing labels, disabled actions, focus, small text, tab order
+- `ux_issues` — cognitive overload, duplicate labels, orphaned labels, nesting, placeholders
+- `consistency_issues` — size, font, padding, spacing, corner radius, layout manager consistency
+- `rule_violations` — hidden interactive, empty text, excessive nesting, zero dimensions, content quality
 
 #### Contrast Issue Example
 
@@ -172,18 +181,27 @@ submit_btn.grid(row=5, column=0, sticky="ew", padx=(145, 0))
 ```json
 {
   "summary_score": {
-    "layout_score": 45.0,      // 0-100, based on violation count & severity
+    "layout_score": 45.0,
     "accessibility_score": 60.0,
+    "ux_score": 70.0,
     "interaction_score": 100.0,
-    "overall_score": 66.0       // Weighted average
+    "overall_score": 62.0
   }
 }
 ```
+
+**Score Categories:**
+- `layout_score`: Based on layout violations + consistency issues
+- `accessibility_score`: Based on contrast + accessibility issues
+- `ux_score`: Based on UX issues + rule violations
+- `interaction_score`: Based on event simulation success rate
+- `overall_score`: Weighted combination with UX penalty
 
 **AI can:**
 - Establish baseline before fixes
 - Verify improvements after fixes
 - Prioritize high-impact issues (critical severity, low scores)
+- Use `ux_score` to focus on usability improvements
 
 ## AI Prompt Templates
 
@@ -198,7 +216,7 @@ INPUT:
 
 TASK:
 1. Read the widget_tree to understand the UI structure
-2. List all issues grouped by category (contrast, accessibility, layout)
+2. List all issues grouped by category (contrast, accessibility, layout, UX, consistency, rules)
 3. Prioritize issues by severity (critical > high > medium > low)
 4. For each issue, explain:
    - What's wrong
@@ -219,6 +237,8 @@ INPUT:
 - Validation report showing:
   - 2 contrast issues (critical)
   - 1 missing label (high)
+  - 3 UX issues (medium)
+  - 2 consistency issues (low)
   - 5 alignment issues (low)
 
 TASK:
@@ -442,12 +462,15 @@ best_practices = extract_high_scoring_patterns(reports)
 **Input Report:**
 ```json
 {
-  "summary_score": {"overall_score": 52.0},
+  "summary_score": {"overall_score": 52.0, "ux_score": 65.0},
   "contrast_issues": [
     {"widget_id": "status_label", "contrast_ratio": 1.90, "required_ratio": 4.5}
   ],
   "accessibility_issues": [
     {"rule_id": "missing_label", "widget_id": "notes_entry"}
+  ],
+  "ux_issues": [
+    {"rule_id": "button_no_command", "widget_id": "cancel_btn"}
   ]
 }
 ```
@@ -457,19 +480,22 @@ best_practices = extract_high_scoring_patterns(reports)
 # Before
 status_label = CTkLabel(app, text="Ready", fg_color="#555555", bg_color="#444444")
 notes_entry = CTkEntry(app, test_id="notes_entry")
+cancel_btn = CTkButton(app, text="Cancel")
 
 # After
 status_label = CTkLabel(app, text="Ready", fg_color="#CCCCCC", bg_color="#333333")  # 5.12:1 ✓
 notes_label = CTkLabel(app, text="Notes:")
 notes_entry = CTkEntry(app, test_id="notes_entry")
+cancel_btn = CTkButton(app, text="Cancel", command=self.on_cancel)  # command bound ✓
 ```
 
 **Verification Report:**
 ```json
 {
-  "summary_score": {"overall_score": 85.0},
+  "summary_score": {"overall_score": 85.0, "ux_score": 90.0},
   "contrast_issues": [],
-  "accessibility_issues": []
+  "accessibility_issues": [],
+  "ux_issues": []
 }
 ```
 
@@ -479,7 +505,9 @@ fix: Improve UX score from 52.0 to 85.0
 
 - Fixed status_label contrast ratio (1.90:1 → 5.12:1)
 - Added missing label for notes_entry
+- Bound command to cancel_btn
 - All critical and high severity issues resolved
+- UX score: 65.0 → 90.0
 ```
 
 ## Next Steps

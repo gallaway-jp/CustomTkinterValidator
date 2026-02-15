@@ -67,10 +67,13 @@ Compare UX metrics across different applications or versions.
 │  │ Tree         │ Layout       │ Contrast             │    │
 │  │ Extractor    │ Metrics      │ Checker              │    │
 │  └──────────────┴──────────────┴──────────────────────┘    │
-│  ┌──────────────┬──────────────┐                           │
-│  │ Accessibility │ Rule         │                           │
-│  │ Checker       │ Engine       │                           │
-│  └──────────────┴──────────────┘                           │
+│  ┌──────────────┬──────────────┬──────────────────────┐    │
+│  │ Accessibility │ UX           │ Consistency          │    │
+│  │ Checker       │ Analyzer     │ Checker              │    │
+│  └──────────────┴──────────────┴──────────────────────┘    │
+│  ┌──────────────┐                                          │
+│  │ Rule Engine  │                                          │
+│  └──────────────┘                                          │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼
@@ -85,7 +88,7 @@ Compare UX metrics across different applications or versions.
 - **Python 3.12+**: Modern Python with dataclasses and type hints
 - **CustomTkinter 5.2+**: Target UI library
 - **Tkinter**: Low-level introspection via `winfo_*` methods
-- **WCAG 2.1**: Official contrast ratio formula (relative luminance)
+- **WCAG 2.1**: Contrast ratios for AA (4.5:1), AAA (7:1), and non-text (3:1)
 
 ## Design Principles
 
@@ -124,7 +127,7 @@ runner.run_headless(
 {
   "metadata": {
     "tool": "CustomTkinter Validator",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "timestamp": "2026-02-15T12:00:00+00:00",
     "tab_order": ["widget1", "widget2", ...]
   },
@@ -132,12 +135,16 @@ runner.run_headless(
   "layout_violations": [ ... ],
   "contrast_issues": [ ... ],
   "accessibility_issues": [ ... ],
+  "ux_issues": [ ... ],
+  "consistency_issues": [ ... ],
+  "rule_violations": [ ... ],
   "interaction_results": [ ... ],
   "summary_score": {
     "layout_score": 75.0,
     "accessibility_score": 85.0,
+    "ux_score": 70.0,
     "interaction_score": 100.0,
-    "overall_score": 86.0
+    "overall_score": 82.0
   }
 }
 ```
