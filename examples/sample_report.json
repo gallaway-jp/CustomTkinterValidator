@@ -1,0 +1,796 @@
+{
+  "metadata": {
+    "tool": "CustomTkinter Validator",
+    "version": "1.0.0",
+    "timestamp": "2026-02-15T06:03:55.940144+00:00",
+    "python_version": "3.13.9",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "tab_order": [
+      "name_entry",
+      "email_entry",
+      "password_entry",
+      "agree_checkbox",
+      "submit_btn",
+      "reset_btn",
+      "close_btn",
+      "notes_entry"
+    ]
+  },
+  "widget_tree": {
+    "widget_type": "CTk",
+    "test_id": "CTk_root",
+    "text": null,
+    "font_family": null,
+    "font_size": null,
+    "font_weight": "normal",
+    "fg_color": "#242424",
+    "bg_color": "#242424",
+    "width": 720,
+    "height": 930,
+    "x": 228,
+    "y": 228,
+    "abs_x": 239,
+    "abs_y": 273,
+    "visibility": true,
+    "enabled": true,
+    "parent_id": null,
+    "children_ids": [
+      "heading_label",
+      "form_frame",
+      "button_frame",
+      "error_label",
+      "footer_frame",
+      "notes_frame"
+    ],
+    "children": [
+      {
+        "widget_type": "TLabel",
+        "test_id": "heading_label",
+        "text": "User Registration",
+        "font_family": "Roboto",
+        "font_size": 22,
+        "font_weight": "bold",
+        "fg_color": "#dce4ee",
+        "bg_color": "#242424",
+        "width": 268,
+        "height": 42,
+        "x": 226,
+        "y": 30,
+        "abs_x": 465,
+        "abs_y": 303,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [],
+        "children": [],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 0,
+          "pady": 30,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      },
+      {
+        "widget_type": "TFrame",
+        "test_id": "form_frame",
+        "text": null,
+        "font_family": null,
+        "font_size": null,
+        "font_weight": "normal",
+        "fg_color": "#2b2b2b",
+        "bg_color": "#242424",
+        "width": 630,
+        "height": 257,
+        "x": 45,
+        "y": 102,
+        "abs_x": 284,
+        "abs_y": 375,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [
+          "name_label",
+          "name_entry",
+          "email_label",
+          "email_entry",
+          "password_label",
+          "password_entry",
+          "agree_checkbox"
+        ],
+        "children": [
+          {
+            "widget_type": "TLabel",
+            "test_id": "name_label",
+            "text": "Full Name:",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 96,
+            "height": 42,
+            "x": 15,
+            "y": 12,
+            "abs_x": 299,
+            "abs_y": 387,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TEntry",
+            "test_id": "name_entry",
+            "text": "",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 488,
+            "height": 42,
+            "x": 127,
+            "y": 12,
+            "abs_x": 411,
+            "abs_y": 387,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TLabel",
+            "test_id": "email_label",
+            "text": "Email:",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 55,
+            "height": 42,
+            "x": 56,
+            "y": 78,
+            "abs_x": 340,
+            "abs_y": 453,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TEntry",
+            "test_id": "email_entry",
+            "text": "",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 488,
+            "height": 42,
+            "x": 127,
+            "y": 78,
+            "abs_x": 411,
+            "abs_y": 453,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TLabel",
+            "test_id": "password_label",
+            "text": "Password:",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 93,
+            "height": 42,
+            "x": 18,
+            "y": 144,
+            "abs_x": 302,
+            "abs_y": 519,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TEntry",
+            "test_id": "password_entry",
+            "text": "",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 488,
+            "height": 42,
+            "x": 127,
+            "y": 144,
+            "abs_x": 411,
+            "abs_y": 519,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 12,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TCheckBox",
+            "test_id": "agree_checkbox",
+            "text": "I agree to the Terms and Conditions",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 364,
+            "height": 36,
+            "x": 15,
+            "y": 213,
+            "abs_x": 299,
+            "abs_y": 588,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "form_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "grid",
+            "padding": {
+              "padx": 15,
+              "pady": 15,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          }
+        ],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 45,
+          "pady": 15,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      },
+      {
+        "widget_type": "TFrame",
+        "test_id": "button_frame",
+        "text": null,
+        "font_family": null,
+        "font_size": null,
+        "font_weight": "normal",
+        "fg_color": "#2b2b2b",
+        "bg_color": "#242424",
+        "width": 630,
+        "height": 58,
+        "x": 45,
+        "y": 382,
+        "abs_x": 284,
+        "abs_y": 655,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [
+          "submit_btn",
+          "reset_btn"
+        ],
+        "children": [
+          {
+            "widget_type": "TButton",
+            "test_id": "submit_btn",
+            "text": "Submit",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 210,
+            "height": 42,
+            "x": 15,
+            "y": 8,
+            "abs_x": 299,
+            "abs_y": 663,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "button_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "pack",
+            "padding": {
+              "padx": 15,
+              "pady": 8,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TButton",
+            "test_id": "reset_btn",
+            "text": "Reset",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 210,
+            "height": 42,
+            "x": 230,
+            "y": 8,
+            "abs_x": 514,
+            "abs_y": 663,
+            "visibility": true,
+            "enabled": false,
+            "parent_id": "button_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "pack",
+            "padding": {
+              "padx": 15,
+              "pady": 8,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          }
+        ],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 45,
+          "pady": 8,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      },
+      {
+        "widget_type": "TLabel",
+        "test_id": "error_label",
+        "text": "",
+        "font_family": "Roboto",
+        "font_size": 12,
+        "font_weight": "normal",
+        "fg_color": "#ff0000",
+        "bg_color": "#242424",
+        "width": 1,
+        "height": 42,
+        "x": 359,
+        "y": 448,
+        "abs_x": 598,
+        "abs_y": 721,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [],
+        "children": [],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 45,
+          "pady": 8,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      },
+      {
+        "widget_type": "TFrame",
+        "test_id": "footer_frame",
+        "text": null,
+        "font_family": null,
+        "font_size": null,
+        "font_weight": "normal",
+        "fg_color": "#2b2b2b",
+        "bg_color": "#242424",
+        "width": 630,
+        "height": 115,
+        "x": 45,
+        "y": 513,
+        "abs_x": 284,
+        "abs_y": 786,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [
+          "status_label",
+          "close_btn"
+        ],
+        "children": [
+          {
+            "widget_type": "TLabel",
+            "test_id": "status_label",
+            "text": "Status: Ready",
+            "font_family": "Roboto",
+            "font_size": 11,
+            "font_weight": "normal",
+            "fg_color": "#555555",
+            "bg_color": "#2b2b2b",
+            "width": 600,
+            "height": 42,
+            "x": 15,
+            "y": 8,
+            "abs_x": 299,
+            "abs_y": 794,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "footer_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "pack",
+            "padding": {
+              "padx": 15,
+              "pady": 8,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          },
+          {
+            "widget_type": "TButton",
+            "test_id": "close_btn",
+            "text": "Close",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 210,
+            "height": 42,
+            "x": 210,
+            "y": 58,
+            "abs_x": 494,
+            "abs_y": 844,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "footer_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "pack",
+            "padding": {
+              "padx": 15,
+              "pady": 15,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          }
+        ],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 45,
+          "pady": 15,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      },
+      {
+        "widget_type": "TFrame",
+        "test_id": "notes_frame",
+        "text": null,
+        "font_family": null,
+        "font_size": null,
+        "font_weight": "normal",
+        "fg_color": "#2b2b2b",
+        "bg_color": "#242424",
+        "width": 630,
+        "height": 50,
+        "x": 45,
+        "y": 636,
+        "abs_x": 284,
+        "abs_y": 909,
+        "visibility": true,
+        "enabled": true,
+        "parent_id": "CTk_root",
+        "children_ids": [
+          "notes_entry"
+        ],
+        "children": [
+          {
+            "widget_type": "TEntry",
+            "test_id": "notes_entry",
+            "text": "",
+            "font_family": "Roboto",
+            "font_size": 13,
+            "font_weight": "normal",
+            "fg_color": "#dce4ee",
+            "bg_color": "#2b2b2b",
+            "width": 600,
+            "height": 42,
+            "x": 15,
+            "y": 0,
+            "abs_x": 299,
+            "abs_y": 909,
+            "visibility": true,
+            "enabled": true,
+            "parent_id": "notes_frame",
+            "children_ids": [],
+            "children": [],
+            "layout_manager": "pack",
+            "padding": {
+              "padx": 15,
+              "pady": 8,
+              "ipadx": 0,
+              "ipady": 0
+            }
+          }
+        ],
+        "layout_manager": "pack",
+        "padding": {
+          "padx": 45,
+          "pady": 8,
+          "ipadx": 0,
+          "ipady": 0
+        }
+      }
+    ],
+    "layout_manager": "wm",
+    "padding": {
+      "padx": 0,
+      "pady": 0,
+      "ipadx": 0,
+      "ipady": 0
+    }
+  },
+  "layout_violations": [
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "heading_label",
+      "description": "'heading_label' left edge at x=465 deviates 181px from the common alignment at x=284",
+      "recommended_fix": "Align 'heading_label' with its siblings at x=284",
+      "measured_value": 181.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "error_label",
+      "description": "'error_label' left edge at x=598 deviates 314px from the common alignment at x=284",
+      "recommended_fix": "Align 'error_label' with its siblings at x=284",
+      "measured_value": 314.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "name_label",
+      "description": "'name_label' left edge at x=299 deviates 112px from the common alignment at x=411",
+      "recommended_fix": "Align 'name_label' with its siblings at x=411",
+      "measured_value": 112.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "email_label",
+      "description": "'email_label' left edge at x=340 deviates 71px from the common alignment at x=411",
+      "recommended_fix": "Align 'email_label' with its siblings at x=411",
+      "measured_value": 71.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "password_label",
+      "description": "'password_label' left edge at x=302 deviates 109px from the common alignment at x=411",
+      "recommended_fix": "Align 'password_label' with its siblings at x=411",
+      "measured_value": 109.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "alignment_inconsistency",
+      "severity": "low",
+      "widget_id": "agree_checkbox",
+      "description": "'agree_checkbox' left edge at x=299 deviates 112px from the common alignment at x=411",
+      "recommended_fix": "Align 'agree_checkbox' with its siblings at x=411",
+      "measured_value": 112.0,
+      "threshold": 3.0
+    },
+    {
+      "rule_id": "symmetry_deviation",
+      "severity": "low",
+      "widget_id": "name_label",
+      "description": "'name_label' has asymmetric placement within 'form_frame': left space=15px, right space=519px",
+      "recommended_fix": "Centre 'name_label' within 'form_frame' or use consistent margins",
+      "related_widget_id": "form_frame",
+      "measured_value": 504.0,
+      "threshold": 10.0
+    },
+    {
+      "rule_id": "symmetry_deviation",
+      "severity": "low",
+      "widget_id": "email_label",
+      "description": "'email_label' has asymmetric placement within 'form_frame': left space=56px, right space=519px",
+      "recommended_fix": "Centre 'email_label' within 'form_frame' or use consistent margins",
+      "related_widget_id": "form_frame",
+      "measured_value": 463.0,
+      "threshold": 10.0
+    },
+    {
+      "rule_id": "symmetry_deviation",
+      "severity": "low",
+      "widget_id": "password_label",
+      "description": "'password_label' has asymmetric placement within 'form_frame': left space=18px, right space=519px",
+      "recommended_fix": "Centre 'password_label' within 'form_frame' or use consistent margins",
+      "related_widget_id": "form_frame",
+      "measured_value": 501.0,
+      "threshold": 10.0
+    },
+    {
+      "rule_id": "symmetry_deviation",
+      "severity": "low",
+      "widget_id": "agree_checkbox",
+      "description": "'agree_checkbox' has asymmetric placement within 'form_frame': left space=15px, right space=251px",
+      "recommended_fix": "Centre 'agree_checkbox' within 'form_frame' or use consistent margins",
+      "related_widget_id": "form_frame",
+      "measured_value": 236.0,
+      "threshold": 10.0
+    },
+    {
+      "rule_id": "symmetry_deviation",
+      "severity": "low",
+      "widget_id": "submit_btn",
+      "description": "'submit_btn' has asymmetric placement within 'button_frame': left space=15px, right space=405px",
+      "recommended_fix": "Centre 'submit_btn' within 'button_frame' or use consistent margins",
+      "related_widget_id": "button_frame",
+      "measured_value": 390.0,
+      "threshold": 10.0
+    }
+  ],
+  "contrast_issues": [
+    {
+      "rule_id": "insufficient_contrast",
+      "severity": "critical",
+      "widget_id": "status_label",
+      "fg_color": "#555555",
+      "bg_color": "#2b2b2b",
+      "contrast_ratio": 1.9,
+      "required_ratio": 4.5,
+      "wcag_level": "AA",
+      "description": "'status_label' has contrast ratio 1.90:1 (required: 4.5:1 for normal text)",
+      "recommended_fix": "Change the foreground colour of 'status_label' to achieve at least 4.5:1 contrast against #2b2b2b"
+    }
+  ],
+  "accessibility_issues": [
+    {
+      "rule_id": "missing_label",
+      "severity": "high",
+      "widget_id": "notes_entry",
+      "description": "Entry widget 'notes_entry' has no associated label in the same parent container (0 label(s) for 1 entry/entries)",
+      "recommended_fix": "Add a descriptive label widget as a sibling of 'notes_entry' in its parent container"
+    },
+    {
+      "rule_id": "disabled_primary_action",
+      "severity": "medium",
+      "widget_id": "reset_btn",
+      "description": "Primary action button 'reset_btn' (text: 'Reset') is disabled",
+      "recommended_fix": "Ensure 'reset_btn' is enabled when the user can reasonably invoke the action, or provide inline guidance explaining what is needed"
+    },
+    {
+      "rule_id": "unreachable_focusable",
+      "severity": "high",
+      "widget_id": "close_btn",
+      "description": "Interactive widget 'close_btn' has takefocus disabled and cannot be reached via keyboard navigation",
+      "recommended_fix": "Set takefocus=True on 'close_btn' or provide an alternative keyboard-accessible way to interact with it"
+    }
+  ],
+  "interaction_results": [
+    {
+      "action": "focus",
+      "widget_id": "name_entry",
+      "success": true,
+      "detail": "Focused 'name_entry'"
+    },
+    {
+      "action": "type_text",
+      "widget_id": "name_entry",
+      "success": true,
+      "detail": "Typed 'Alice Johnson' into 'name_entry'"
+    },
+    {
+      "action": "tab",
+      "widget_id": "name_entry",
+      "success": true,
+      "detail": "Tabbed from 'name_entry' to 'unknown'"
+    },
+    {
+      "action": "focus",
+      "widget_id": "email_entry",
+      "success": true,
+      "detail": "Focused 'email_entry'"
+    },
+    {
+      "action": "type_text",
+      "widget_id": "email_entry",
+      "success": true,
+      "detail": "Typed 'alice@example.com' into 'email_entry'"
+    },
+    {
+      "action": "focus",
+      "widget_id": "password_entry",
+      "success": true,
+      "detail": "Focused 'password_entry'"
+    },
+    {
+      "action": "type_text",
+      "widget_id": "password_entry",
+      "success": true,
+      "detail": "Typed 'SecureP@ss123' into 'password_entry'"
+    },
+    {
+      "action": "click",
+      "widget_id": "agree_checkbox",
+      "success": true,
+      "detail": "Clicked 'agree_checkbox' (TCheckBox)"
+    },
+    {
+      "action": "click",
+      "widget_id": "submit_btn",
+      "success": true,
+      "detail": "Clicked 'submit_btn' (TButton)"
+    },
+    {
+      "action": "click",
+      "widget_id": "reset_btn",
+      "success": true,
+      "detail": "Click on 'reset_btn' ignored: widget is disabled"
+    },
+    {
+      "action": "hover",
+      "widget_id": "close_btn",
+      "success": true,
+      "detail": "Hovered over 'close_btn'"
+    }
+  ],
+  "summary_score": {
+    "layout_score": 45.0,
+    "accessibility_score": 35.0,
+    "interaction_score": 100.0,
+    "overall_score": 57.5
+  }
+}
