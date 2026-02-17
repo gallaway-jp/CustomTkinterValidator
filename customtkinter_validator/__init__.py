@@ -5,6 +5,7 @@ __author__ = "CustomTkinter Validator Team"
 
 from customtkinter_validator.core.config import ValidatorConfig
 from customtkinter_validator.core.runner import TestRunner
+from customtkinter_validator.test_harness.auto_explorer import AutoExplorer
 from customtkinter_validator.test_harness.event_simulator import EventSimulator
 from customtkinter_validator.test_harness.injector import Injector
 from customtkinter_validator.test_harness.widget_registry import WidgetRegistry
@@ -19,6 +20,7 @@ from customtkinter_validator.widgets.base import (
 )
 
 __all__ = [
+    "AutoExplorer",
     "TestRunner",
     "ValidatorConfig",
     "TestableWidget",

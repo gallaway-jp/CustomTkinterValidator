@@ -82,6 +82,17 @@ class EventSimulator:
         """Discard all collected interaction results."""
         self._results.clear()
 
+    def add_result(self, result: InteractionResult) -> None:
+        """Append an externally-created interaction result.
+
+        Used by ``AutoExplorer`` to record tab-switch actions without
+        duplicating the result-tracking logic.
+
+        Args:
+            result: The result to record.
+        """
+        self._results.append(result)
+
     def click(self, widget_id: str) -> InteractionResult:
         """Simulate a mouse click on the widget identified by *widget_id*.
 

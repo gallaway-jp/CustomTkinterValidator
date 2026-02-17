@@ -19,6 +19,7 @@ from customtkinter_validator.analyzer.ux_analyzer import UXAnalyzer
 from customtkinter_validator.core.config import ValidatorConfig
 from customtkinter_validator.reporting.json_serializer import JsonSerializer
 from customtkinter_validator.reporting.rule_engine import RuleEngine
+from customtkinter_validator.test_harness.auto_explorer import AutoExplorer
 from customtkinter_validator.test_harness.event_simulator import EventSimulator
 from customtkinter_validator.test_harness.injector import Injector
 from customtkinter_validator.test_harness.widget_registry import WidgetRegistry
@@ -51,6 +52,7 @@ class TestRunner:
         self._registry = WidgetRegistry()
         self._injector = Injector(self._registry, self._config)
         self._simulator = EventSimulator(self._registry)
+        self._explorer = AutoExplorer(self._registry, self._simulator)
         self._tree_extractor = TreeExtractor(self._registry, self._config)
         self._layout_metrics = LayoutMetrics(self._config)
         self._contrast_checker = ContrastChecker(self._config)
@@ -71,6 +73,11 @@ class TestRunner:
     def simulator(self) -> EventSimulator:
         """Return the event simulator."""
         return self._simulator
+
+    @property
+    def explorer(self) -> AutoExplorer:
+        """Return the auto-explorer."""
+        return self._explorer
 
     @property
     def rule_engine(self) -> RuleEngine:
@@ -194,11 +201,29 @@ class TestRunner:
             raise RuntimeError("No report available. Call analyse() first.")
         print(self._serializer.serialise(self._report, indent=indent))
 
+    def explore(self) -> list[dict[str, Any]]:
+        """Auto-explore the GUI by interacting with every widget.
+
+        Switches all ``CTkTabview`` tabs, types into entries, clicks
+        non-destructive buttons, toggles checkboxes/switches, and
+        walks the focus chain — no script required.
+
+        Returns:
+            List of interaction result dictionaries.
+
+        Raises:
+            RuntimeError: If no application has been attached.
+        """
+        if self._root is None:
+            raise RuntimeError("No application attached. Call set_app() first.")
+        return self._explorer.explore(self._root)
+
     def run_headless(
         self,
         app_factory: Callable[[], tk.Misc],
         script: Callable[[EventSimulator], Any] | None = None,
         output_path: str | Path | None = None,
+        auto_explore: bool = False,
     ) -> dict[str, Any]:
         """Convenience method: create app, inject, simulate, analyse, save.
 
@@ -207,8 +232,11 @@ class TestRunner:
         Args:
             app_factory: A callable that creates and returns the root window.
                 The factory MUST NOT call ``mainloop()``.
-            script: Optional interaction script.
+            script: Optional interaction script.  Ignored when
+                *auto_explore* is ``True``.
             output_path: Optional path to save the JSON report.
+            auto_explore: When ``True``, automatically discover and
+                interact with every widget instead of running a script.
 
         Returns:
             The complete report dictionary.
@@ -224,7 +252,9 @@ class TestRunner:
 
         self.inject()
 
-        if script is not None:
+        if auto_explore:
+            self.explore()
+        elif script is not None:
             self.simulate(script)
 
         report = self.analyse()

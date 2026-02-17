@@ -62,6 +62,15 @@ def main() -> None:
         dest="print_report",
         help="Print the report to stdout in addition to saving",
     )
+    parser.add_argument(
+        "--auto-explore",
+        action="store_true",
+        default=False,
+        help=(
+            "Automatically discover and interact with every widget "
+            "(no interaction script required)"
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -89,6 +98,7 @@ def main() -> None:
     report = runner.run_headless(
         app_factory=create_app,
         output_path=args.output,
+        auto_explore=args.auto_explore,
     )
 
     if args.print_report:

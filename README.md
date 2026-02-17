@@ -74,6 +74,44 @@ python examples/sample_test.py
 
 This launches the sample app headlessly, injects the harness, simulates a user flow (typing into fields, clicking buttons, tabbing), runs the full analysis, and saves `sample_report.json`.
 
+### Auto-Explore Mode
+
+Auto-explore mode automatically discovers and interacts with every widget in the GUI — no pre-written interaction script required.  It exercises the full UI through a 3-phase exploration strategy:
+
+1. **Tab discovery** — finds all `CTkTabview` widgets and switches to every tab so hidden content becomes visible.
+2. **Widget interaction** — iterates every registered widget and interacts by type: types sample text into entries/textboxes, toggles checkboxes and switches, selects radio buttons, moves sliders, picks option-menu/combobox values, and hovers over buttons.
+3. **Focus chain walk** — walks the Tab key chain to verify keyboard navigation, with automatic cycle detection.
+
+#### CLI
+
+```bash
+python -m customtkinter_validator --app examples.sample_app --auto-explore --print
+```
+
+#### Programmatic
+
+```python
+from customtkinter_validator import TestRunner, ValidatorConfig
+
+config = ValidatorConfig(min_contrast_ratio_normal=4.5)
+runner = TestRunner(config)
+
+# One-liner: create app, inject, explore, analyse, save
+report = runner.run_headless(
+    app_factory=my_create_app_function,
+    auto_explore=True,
+    output_path="report.json",
+)
+
+# Or step-by-step for more control
+runner.set_app(root)
+runner.inject()
+runner.explore()       # Auto-explore all widgets
+report = runner.analyse()
+```
+
+> **Note:** Buttons are hovered rather than clicked during auto-exploration to avoid triggering blocking callbacks (file dialogs, network requests, long computations).  For button-click testing, use a custom `script` instead.
+
 ### Programmatic Usage
 
 ```python
@@ -106,7 +144,8 @@ customtkinter_validator/
 ├── test_harness/
 │   ├── widget_registry.py   # test_id → widget mapping
 │   ├── injector.py          # Widget-tree walker + auto-id assignment
-│   └── event_simulator.py   # Deterministic event generation
+│   ├── event_simulator.py   # Deterministic event generation
+│   └── auto_explorer.py     # Automatic GUI exploration (no script needed)
 ├── analyzer/
 │   ├── tree_extractor.py    # Full widget metadata extraction
 │   ├── layout_metrics.py    # Spatial analysis (overlap, spacing, alignment, bounds, truncation)
@@ -141,7 +180,8 @@ TreeExtractor ──► widget_tree (nested dict with 25+ fields per widget)
   │
   ▼
 EventSimulator ──► interaction_results
-  │
+  │                   ▲
+  │            AutoExplorer (auto-explore mode)
   ▼
 JsonSerializer ──► JSON report (6 issue categories + scores)
 ```
